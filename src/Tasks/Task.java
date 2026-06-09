@@ -3,17 +3,17 @@ package Tasks;
 public class Task {
 
     // Name of the task. Displayed in the task list.
-    private String Name;
+    private String Name = "";
     // The suggested start time for the task.
-    private int StartTime;
+    private int StartTime = 0;
     // The suggested end time for the task.
-    private int EndTime;
+    private int EndTime = 0;
     // The duration of the task.
-    private int Duration;
+    private int Duration = 0;
     // If true, ensure this task starts at the given time.
-    private boolean LockStartTime;
+    private boolean LockStartTime = false;
     // If true, ensure this task ends at the given time.
-    private boolean LockEndTime;
+    private boolean LockEndTime = false;
 
     public String getName() {
         return Name;

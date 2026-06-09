@@ -7,7 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 
-public class EditItem extends JFrame{
+public class EditItem extends JFrame {
     private JPanel contentPane;
     private JTextField Name;
     private JButton createButton;
@@ -39,13 +39,15 @@ public class EditItem extends JFrame{
     public void setupPanel() {
 
         // Update displayed parameters with the task assigned to EditItem
-        if (task != null){
-            Name.setText(task.getName());
-            StartTime.setText(String.valueOf(task.getStartTime()));
-            EndTime.setText(String.valueOf(task.getEndTime()));
-            Duration.setText(String.valueOf(task.getDuration()));
-
+        if (task == null) {
+            task = new Task();
         }
+        Name.setText(task.getName());
+        StartTime.setText(String.valueOf(task.getStartTime()));
+        EndTime.setText(String.valueOf(task.getEndTime()));
+        Duration.setText(String.valueOf(task.getDuration()));
+        lockRadioButton.setSelected(task.isLockStartTime());
+        lockRadioButton1.setSelected(task.isLockEndTime());
 
         // Set up lock listeners here
 //        timeLockListener = new TimeLockListener();
