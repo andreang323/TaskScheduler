@@ -41,10 +41,11 @@ public class EditItem extends JFrame{
         // Update displayed parameters with the task assigned to EditItem
         if (task != null){
             Name.setText(task.getName());
-            StartTime.setText(String.valueOf(task.getStartTime()));
-            EndTime.setText(String.valueOf(task.getEndTime()));
-            Duration.setText(String.valueOf(task.getDuration()));
-
+            StartTime.setText(task.getStartTime());
+            EndTime.setText(task.getEndTime());
+            Duration.setText(task.getDuration());
+            lockRadioButton.setSelected(task.isLockStartTime());
+            lockRadioButton2.setSelected(task.isLockEndTime());
         }
 
         // Set up lock listeners here
@@ -71,7 +72,9 @@ public class EditItem extends JFrame{
         });
     }
 
-    public EditItem(String newTitle){
+    public EditItem(String newTitle, Task newTask){
+        task = newTask;
+
         setTitle(newTitle);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setContentPane(contentPane);
@@ -93,10 +96,12 @@ public class EditItem extends JFrame{
         System.out.println("Saving changes.");
 
         // Update the task object that we have
-        String taskName = Name.getText();
-
-        Task task = new Task();
-        task.setName(taskName);
+        task.setName(Name.getText());
+        task.setStartTime(StartTime.getText());
+        task.setEndTime(EndTime.getText());
+        task.setDuration(Duration.getText());
+        task.setLockStartTime(lockRadioButton.isSelected());
+        task.setLockEndTime(lockRadioButton2.isSelected());
 
         // Notify the listener with the task object
         if (saveButtonListener != null){
