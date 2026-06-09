@@ -8,8 +8,6 @@ public class Main {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         mainScheduler =  new SchedulerWindow();
-        EditItem addItem = new EditItem("Adding new task:");
-        addItem.setVisible(true);
       }
     });
 

@@ -1,10 +1,13 @@
 package SchedulerUI;
 
 import Tasks.Task;
+import forms.EditItem;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
-import javax.swing.border.TitledBorder;
 
 public class SchedulerWindow extends JFrame{
     private JPanel contentPane;
@@ -42,6 +45,15 @@ public class SchedulerWindow extends JFrame{
         JButton newButton = new JButton("New");
 
         panel.add(newButton);
+
+        // Open a new EditItem JFrame
+        newButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                EditItem addItem = new EditItem("Adding new task:");
+                addItem.setVisible(true);
+            }
+        });
 
         panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Tasks"));
 

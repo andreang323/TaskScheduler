@@ -27,18 +27,27 @@ public class EditItem extends JFrame{
     private JList list5;
     private JList Group;
     private JButton validateButton;
-    private JCheckBox restrictSchedulingToAllocatedCheckBox;
     private JFormattedTextField formattedTextField1;
     private JCheckBox Optional;
-    private JCheckBox skipDependantTaskIfCheckBox;
+    private JCheckBox skipDependentTaskIfCheckBox;
     private JCheckBox reduceDurationOfThisCheckBox;
     private JTextField textField1;
-    private JList list6;
     private TimeLockListener timeLockListener;
     private SaveButtonListener saveButtonListener;
     private Task task;
 
-    public void setupValidation() {
+    public void setupPanel() {
+
+        // Update displayed parameters with the task assigned to EditItem
+        if (task != null){
+            Name.setText(task.getName());
+            StartTime.setText(String.valueOf(task.getStartTime()));
+            EndTime.setText(String.valueOf(task.getEndTime()));
+            Duration.setText(String.valueOf(task.getDuration()));
+
+        }
+
+        // Set up lock listeners here
 //        timeLockListener = new TimeLockListener();
 //        lockRadioButton.addActionListener(timeLockListener);
 //        lockRadioButton1.addActionListener(timeLockListener);
@@ -68,7 +77,7 @@ public class EditItem extends JFrame{
         setContentPane(contentPane);
         pack();
 
-        setupValidation();
+        setupPanel();
 
 //        setSize(300, 200);
         setLocationRelativeTo(null);
