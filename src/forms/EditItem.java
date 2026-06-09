@@ -7,7 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 
-public class EditItem extends JFrame{
+public class EditItem extends JFrame {
     private JPanel contentPane;
     private JTextField Name;
     private JButton createButton;
@@ -32,6 +32,13 @@ public class EditItem extends JFrame{
     private JCheckBox skipDependentTaskIfCheckBox;
     private JCheckBox reduceDurationOfThisCheckBox;
     private JTextField textField1;
+    private JTextField StartTimePosix;
+    private JTextField EndTimePOSIX;
+    private JTextField DurationPosix;
+    private JLabel startTime2Label;
+    private JLabel durationLabel2;
+    private JLabel EndTimeLabel2;
+    private JLabel timeNote;
     private TimeLockListener timeLockListener;
     private SaveButtonListener saveButtonListener;
     private Task task;
@@ -40,7 +47,7 @@ public class EditItem extends JFrame{
     public void setupPanel() {
 
         // Update displayed parameters with the task assigned to EditItem
-        if (task != null){
+        if (task != null) {
             Name.setText(task.getName());
             StartTime.setText(task.getStartTime());
             EndTime.setText(task.getEndTime());
@@ -71,6 +78,32 @@ public class EditItem extends JFrame{
                 dispose();
             }
         });
+
+        StartTime.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // StartTime changed
+                if (lockRadioButton.isSelected()) {
+                    // StartTime locked, treat duration as driven
+
+                } else if(lockRadioButton1.isSelected()) {
+                    // endtime locked, treat duration as driven
+                } else if(lockRadioButton2.isSelected()) {
+                    // duration locked, treat end time as driven
+                }
+            }
+        });
+        EndTime.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        Duration.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            }
+        });
     }
 
     public EditItem(String newTitle, Task newTask, boolean editing){
@@ -99,7 +132,7 @@ public class EditItem extends JFrame{
     }
 
 
-    private void saveChanges(){
+    private void saveChanges() {
         System.out.println("Saving changes.");
 
         // Update the task object that we have
@@ -111,7 +144,7 @@ public class EditItem extends JFrame{
         task.setLockEndTime(lockRadioButton2.isSelected());
 
         // Notify the listener with the task object
-        if (saveButtonListener != null){
+        if (saveButtonListener != null) {
             saveButtonListener.onSubmitClicked(task);
         }
 
