@@ -5,11 +5,11 @@ public class Task {
     // Name of the task. Displayed in the task list.
     private String Name;
     // The suggested start time for the task.
-    private int StartTime;
+    private String StartTime;
     // The suggested end time for the task.
-    private int EndTime;
+    private String EndTime;
     // The duration of the task.
-    private int Duration;
+    private String Duration;
     // If true, ensure this task starts at the given time.
     private boolean LockStartTime;
     // If true, ensure this task ends at the given time.
@@ -23,27 +23,27 @@ public class Task {
         Name = name;
     }
 
-    public int getStartTime() {
+    public String getStartTime() {
         return StartTime;
     }
 
-    public void setStartTime(int startTime) {
+    public void setStartTime(String startTime) {
         StartTime = startTime;
     }
 
-    public int getEndTime() {
+    public String getEndTime() {
         return EndTime;
     }
 
-    public void setEndTime(int endTime) {
+    public void setEndTime(String endTime) {
         EndTime = endTime;
     }
 
-    public int getDuration() {
+    public String getDuration() {
         return Duration;
     }
 
-    public void setDuration(int duration) {
+    public void setDuration(String duration) {
         Duration = duration;
     }
 
