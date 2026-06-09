@@ -19,7 +19,6 @@ public class EditItem extends JFrame {
     private JRadioButton lockRadioButton1;
     private JRadioButton lockRadioButton2;
     private JTextField Priority;
-    private JScrollBar scrollBar1;
     private JList list1;
     private JList list2;
     private JList list3;
@@ -91,12 +90,20 @@ public class EditItem extends JFrame {
         EndTime.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                // End time changed
+                if (lockRadioButton.isSelected()) {
+                    // StartTime locked, treat duration as driven
+                } else if(lockRadioButton1.isSelected()) {
+                    // endtime locked, treat duration as driven
+                } else if (lockRadioButton2.isSelected()) {
+                    // duration is locked, treat start time as driven
+                }
             }
         });
         Duration.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Duration changed
             }
         });
     }
