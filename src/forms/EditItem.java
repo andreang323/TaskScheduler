@@ -32,13 +32,8 @@ public class EditItem extends JFrame {
     private JCheckBox skipDependentTaskIfCheckBox;
     private JCheckBox reduceDurationOfThisCheckBox;
     private JTextField textField1;
-    private JTextField StartTimePosix;
-    private JTextField EndTimePOSIX;
-    private JTextField DurationPosix;
-    private JLabel startTime2Label;
-    private JLabel durationLabel2;
-    private JLabel EndTimeLabel2;
-    private JLabel timeNote;
+    private JLabel timeNote1;
+    private JLabel timeNote2;
     private TimeLockListener timeLockListener;
     private SaveButtonListener saveButtonListener;
     private Task task;
