@@ -2,21 +2,26 @@ package SchedulerUI;
 
 import Tasks.Task;
 import forms.EditItem;
+import forms.SaveButtonListener;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SchedulerWindow extends JFrame{
     private JPanel contentPane;
     private JPanel leftPane;
     private JPanel rightPane;
+    private JPanel tasksListPane;
     private List<Task> tasks;
 
     public SchedulerWindow(){
         setTitle("Task Scheduler");
+
+        tasks = new ArrayList<>();
 
         contentPane = new JPanel();
         leftPane = createLeftPane();
@@ -37,10 +42,15 @@ public class SchedulerWindow extends JFrame{
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(0, 1, 5, 5));
 
-//        for (int i = 0; i < tasks.size(); i++) {
-        for (int i = 0; i < 10; i++) {
-            panel.add(createTaskPanel());
+        tasksListPane = new JPanel();
+        tasksListPane.setLayout(new GridLayout(0, 1, 5, 5));
+
+        // Initialize with any pre-existing tasks
+        for (int i = 0; i < tasks.size(); i++) {
+            tasksListPane.add(createTaskPanel(tasks.get(i)));
         }
+
+        panel.add(tasksListPane);
 
         JButton newButton = new JButton("New");
 
@@ -50,8 +60,27 @@ public class SchedulerWindow extends JFrame{
         newButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                EditItem addItem = new EditItem("Adding new task:");
+
+                // Create a new task associated with this
+                Task newTask = new Task();
+                newTask.setName("Task " + (tasks.size() + 1));
+
+                EditItem addItem = new EditItem("Adding new task:", newTask);
                 addItem.setVisible(true);
+
+                // Callback so that addItem can add the task properly
+                addItem.setSaveButtonListener(new SaveButtonListener() {
+                    @Override
+                    public void onSubmitClicked(Task task) {
+                        System.out.println("Registered new task: " + task.getName());
+                        tasks.add(task);
+                        tasksListPane.add(createTaskPanel(task));
+
+                        // redraw everything because we added a component
+                        tasksListPane.revalidate();
+                        repaint();
+                    }
+                });
             }
         });
 
@@ -84,13 +113,31 @@ public class SchedulerWindow extends JFrame{
 
     // Create a new task panel with task name,
     // edit button, lock button, and delete button
-    public JPanel createTaskPanel() {
+    public JPanel createTaskPanel(Task task) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        JLabel taskName = new JLabel("Task Name");
+        JLabel taskName = new JLabel(task.getName());
         JButton editButton = new JButton("Edit");
         JButton lockButton = new JButton("Lock");
         JButton deleteButton = new JButton("Delete");
+
+        editButton.addActionListener(e -> {
+            EditItem editItem = new EditItem("Editing Task: " + task.getName(), task);
+            editItem.setVisible(true);
+
+            editItem.setSaveButtonListener(updated -> {
+                refreshTaskList();
+            });
+        });
+
+        lockButton.addActionListener(e-> {
+            System.out.println("not implemented yet, to do after display done");
+        });
+
+        deleteButton.addActionListener(e -> {
+            tasks.remove(task);
+            refreshTaskList();
+        });
 
         panel.add(taskName);
         panel.add(editButton);
@@ -107,6 +154,17 @@ public class SchedulerWindow extends JFrame{
 
     public void updateTask() {
 
+    }
+
+    private void refreshTaskList() {
+        tasksListPane.removeAll();
+
+        for (Task task : tasks) {
+            tasksListPane.add(createTaskPanel(task));
+        }
+
+        tasksListPane.revalidate();
+        tasksListPane.repaint();
     }
 
 }
