@@ -35,6 +35,7 @@ public class EditItem extends JFrame{
     private TimeLockListener timeLockListener;
     private SaveButtonListener saveButtonListener;
     private Task task;
+    private boolean editing;
 
     public void setupPanel() {
 
@@ -72,10 +73,16 @@ public class EditItem extends JFrame{
         });
     }
 
-    public EditItem(String newTitle, Task newTask){
-        task = newTask;
+    public EditItem(String newTitle, Task newTask, boolean editing){
+        this.task = newTask;
 
         setTitle(newTitle);
+        if (editing) {
+            createButton.setText("Update");
+        } else {
+            createButton.setText("Create");
+        }
+
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setContentPane(contentPane);
         pack();

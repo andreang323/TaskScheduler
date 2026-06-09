@@ -17,6 +17,9 @@ public class SchedulerWindow extends JFrame{
     private JPanel rightPane;
     private JPanel tasksListPane;
     private List<Task> tasks;
+    private JPanel scheduleDisplayPane;
+    private JTextField scheduleStartTimeField;
+    private JTextField scheduleEndTimeField;
 
     public SchedulerWindow(){
         setTitle("Task Scheduler");
@@ -65,7 +68,7 @@ public class SchedulerWindow extends JFrame{
                 Task newTask = new Task();
                 newTask.setName("Task " + (tasks.size() + 1));
 
-                EditItem addItem = new EditItem("Adding new task:", newTask);
+                EditItem addItem = new EditItem("Adding new task:", newTask, false);
                 addItem.setVisible(true);
 
                 // Callback so that addItem can add the task properly
@@ -122,7 +125,8 @@ public class SchedulerWindow extends JFrame{
         JButton deleteButton = new JButton("Delete");
 
         editButton.addActionListener(e -> {
-            EditItem editItem = new EditItem("Editing Task: " + task.getName(), task);
+            EditItem editItem = new EditItem("Editing Task: " + task.getName(), task, true);
+
             editItem.setVisible(true);
 
             editItem.setSaveButtonListener(updated -> {
