@@ -17,10 +17,7 @@ public class SchedulerWindow extends JFrame{
     private JPanel rightPane;
     private JPanel tasksListPane;
     private List<Task> tasks;
-    private JPanel scheduleDisplayPane;
-    private JTextField scheduleStartTimeField;
-    private JTextField scheduleEndTimeField;
-
+    
     public SchedulerWindow(){
         setTitle("Task Scheduler");
 
