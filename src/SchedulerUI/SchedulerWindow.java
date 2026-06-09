@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SchedulerWindow extends JFrame{
@@ -14,11 +15,18 @@ public class SchedulerWindow extends JFrame{
     private JPanel leftPane;
     private JPanel rightPane;
     private List<Task> tasks;
+    private JPanel taskListPanel;
 
     public SchedulerWindow(){
         setTitle("Task Scheduler");
 
         contentPane = new JPanel();
+        tasks = new ArrayList<>();
+
+        tasks.add(new Task());
+        tasks.add(new Task());
+        tasks.add(new Task());
+
         leftPane = createLeftPane();
         rightPane = createRightPane();
         contentPane.add(leftPane);
@@ -34,33 +42,36 @@ public class SchedulerWindow extends JFrame{
 
     // Need to add scrollbar to this if overflow of task panels
     private JPanel createRightPane() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(0, 1, 5, 5));
+        JPanel panel = new JPanel(new BorderLayout());
 
-//        for (int i = 0; i < tasks.size(); i++) {
-        for (int i = 0; i < 10; i++) {
-            panel.add(createTaskPanel());
-        }
+        taskListPanel = new JPanel();
+        taskListPanel.setLayout(new GridLayout(0, 1, 5, 5));
+
+        JScrollPane scrollPane = new JScrollPane(taskListPanel);
 
         JButton newButton = new JButton("New");
 
-        panel.add(newButton);
-
         // Open a new EditItem JFrame
-        newButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                EditItem addItem = new EditItem("Adding new task:");
-                addItem.setVisible(true);
-            }
+        newButton.addActionListener(e -> {
+            EditItem addItem = new EditItem("Adding new task:");
+            addItem.setVisible(true);
         });
 
-        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Tasks"));
+        panel.add(scrollPane, BorderLayout.CENTER);
+        panel.add(newButton, BorderLayout.SOUTH);
+
+        panel.setBorder(
+                BorderFactory.createTitledBorder(
+                        BorderFactory.createLineBorder(Color.GRAY),
+                        "Tasks"
+                )
+        );
+
+        refreshTaskList();
 
         return panel;
-
-
     }
+
 
     private JPanel createLeftPane() {
         JPanel panel = new JPanel();
@@ -84,13 +95,32 @@ public class SchedulerWindow extends JFrame{
 
     // Create a new task panel with task name,
     // edit button, lock button, and delete button
-    public JPanel createTaskPanel() {
+    public JPanel createTaskPanel(Task task) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+
         JLabel taskName = new JLabel("Task Name");
         JButton editButton = new JButton("Edit");
         JButton lockButton = new JButton("Lock");
         JButton deleteButton = new JButton("Delete");
+
+        editButton.addActionListener(e -> {
+            EditItem editItem = new EditItem("Editing Task: " + taskName);
+            editItem.setVisible(true);
+
+            editItem.setSaveButtonListener(updated -> {
+                refreshTaskList();
+            });
+        });
+
+        lockButton.addActionListener(e-> {
+            System.out.println("not implemented yet, to do after display done");
+        });
+
+        deleteButton.addActionListener(e -> {
+            tasks.remove(task);
+            refreshTaskList();
+        });
 
         panel.add(taskName);
         panel.add(editButton);
@@ -107,6 +137,17 @@ public class SchedulerWindow extends JFrame{
 
     public void updateTask() {
 
+    }
+
+    private void refreshTaskList() {
+        taskListPanel.removeAll();
+
+        for (Task task : tasks) {
+            taskListPanel.add(createTaskPanel(task));
+        }
+
+        taskListPanel.revalidate();
+        taskListPanel.repaint();
     }
 
 }

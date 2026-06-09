@@ -93,6 +93,10 @@ public class EditItem extends JFrame{
         System.out.println("Saving changes.");
 
         // Update the task object that we have
+        String taskName = Name.getText();
+
+        Task task = new Task();
+        task.setName(taskName);
 
         // Notify the listener with the task object
         if (saveButtonListener != null){
