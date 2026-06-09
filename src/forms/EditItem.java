@@ -5,6 +5,8 @@ import Tasks.Task;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 
 public class EditItem extends JFrame {
@@ -77,13 +79,24 @@ public class EditItem extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // StartTime changed
+                System.out.println("StartTime Changed");
+
+                LocalDateTime startDate = LocalDateTime.parse(StartTime.getText());
+                LocalDateTime endDate = LocalDateTime.parse(StartTime.getText());
+//                LocalDateTime durationAsDate = LocalDateTime.parse(Duration.getText());
+
+
                 if (lockRadioButton.isSelected()) {
                     // StartTime locked, treat duration as driven
-
-                } else if(lockRadioButton1.isSelected()) {
+                    Duration.setText(getDurationString(startDate, endDate));
+                } else if (lockRadioButton1.isSelected()) {
                     // endtime locked, treat duration as driven
-                } else if(lockRadioButton2.isSelected()) {
+                    Duration.setText(getDurationString(startDate, endDate));
+                } else if (lockRadioButton2.isSelected()) {
                     // duration locked, treat end time as driven
+                    long durationSeconds = startDate.until(endDate, ChronoUnit.SECONDS);
+                    LocalDateTime endTime = startDate.minusSeconds(durationSeconds);
+                    EndTime.setText(endTime.toString());
                 }
             }
         });
@@ -91,21 +104,64 @@ public class EditItem extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // End time changed
+                System.out.println("EndTime Changed");
+
+                LocalDateTime startDate = LocalDateTime.parse(StartTime.getText());
+                LocalDateTime endDate = LocalDateTime.parse(StartTime.getText());
+//                LocalDateTime durationAsDate = LocalDateTime.parse(Duration.getText());
+
                 if (lockRadioButton.isSelected()) {
                     // StartTime locked, treat duration as driven
-                } else if(lockRadioButton1.isSelected()) {
+                    Duration.setText(getDurationString(startDate, endDate));
+                } else if (lockRadioButton1.isSelected()) {
                     // endtime locked, treat duration as driven
+                    Duration.setText(getDurationString(startDate, endDate));
                 } else if (lockRadioButton2.isSelected()) {
                     // duration is locked, treat start time as driven
+                    long durationSeconds = startDate.until(endDate, ChronoUnit.SECONDS);
+                    LocalDateTime startTime = endDate.plusSeconds(durationSeconds);
+                    EndTime.setText(startTime.toString());
                 }
             }
         });
+
         Duration.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Duration changed
+                System.out.println("Duration Changed");
+
+                LocalDateTime startDate = LocalDateTime.parse(StartTime.getText());
+                LocalDateTime endDate = LocalDateTime.parse(StartTime.getText());
+//                LocalDateTime durationAsDate = LocalDateTime.parse(Duration.getText());
+                long durationSeconds = startDate.until(endDate, ChronoUnit.SECONDS);
+
+                if (lockRadioButton.isSelected()) {
+                    // StartTime locked, treat endTime as driven
+                    LocalDateTime endTime = startDate.plusSeconds(durationSeconds);
+                    EndTime.setText(endTime.toString());
+                } else if (lockRadioButton1.isSelected()) {
+                    // endtime locked, treat startTime as driven
+                    LocalDateTime startTime = endDate.plusSeconds(durationSeconds);
+                    StartTime.setText(startTime.toString());
+                } else if (lockRadioButton2.isSelected()) {
+                    // duration is locked, treat endTime as driven
+                    LocalDateTime endTime = startDate.plusSeconds(durationSeconds);
+                    EndTime.setText(endTime.toString());
+                }
             }
         });
+    }
+
+    private static String getDurationString(LocalDateTime startDate, LocalDateTime endDate) {
+        long durationYears = startDate.until(endDate, ChronoUnit.YEARS);
+        long durationMonths = startDate.until(endDate, ChronoUnit.MONTHS) - (durationYears * 12);
+        long durationDays = startDate.until(endDate, ChronoUnit.DAYS) - (durationMonths * 30);
+        long durationHours = startDate.until(endDate, ChronoUnit.HOURS) - (durationDays * 24);
+        long durationMinutes = startDate.until(endDate, ChronoUnit.MINUTES) - (durationHours * 60);
+        long durationSeconds = startDate.until(endDate, ChronoUnit.SECONDS) - (durationMinutes * 60);
+
+        return durationYears + "-" + durationMonths + "-" + durationDays + " " + durationHours + ":" + durationMinutes + ":" + durationSeconds;
     }
 
     public EditItem(String newTitle, Task newTask, boolean editing){
