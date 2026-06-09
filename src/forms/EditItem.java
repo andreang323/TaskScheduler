@@ -96,8 +96,17 @@ public class EditItem extends JFrame {
 
         // Update the task object that we have
         task.setName(this.Name.getText());
+        if (this.StartTime.getText().isEmpty()) {
+            this.StartTime.setText("0");
+        }
         task.setStartTime(Integer.parseInt(this.StartTime.getText()));
+        if (this.EndTime.getText().isEmpty()) {
+            this.EndTime.setText("0");
+        }
         task.setEndTime(Integer.parseInt(this.EndTime.getText()));
+        if (this.Duration.getText().isEmpty()) {
+            this.Duration.setText("0");
+        }
         task.setDuration(Integer.parseInt(this.Duration.getText()));
         task.setLockStartTime(this.lockRadioButton.isSelected());
         task.setLockEndTime(this.lockRadioButton1.isSelected());
