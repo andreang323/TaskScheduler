@@ -15,6 +15,7 @@ public class SchedulerWindow extends JFrame{
     private JPanel contentPane;
     private JPanel leftPane;
     private JPanel rightPane;
+    private JScrollPane scrollPane;
     private JPanel tasksListPane;
     private List<Task> tasks;
 
@@ -24,37 +25,68 @@ public class SchedulerWindow extends JFrame{
         tasks = new ArrayList<>();
 
         contentPane = new JPanel();
+        contentPane.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 2;
+        gbc.weighty = 1;
+
         leftPane = createLeftPane();
         rightPane = createRightPane();
-        contentPane.add(leftPane);
-        contentPane.add(rightPane);
+        contentPane.add(leftPane,gbc );
+        gbc.weightx = 1;
+        gbc.gridx ++;
+        contentPane.add(rightPane, gbc);
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setContentPane(contentPane);
         pack();
 
+        setSize(860, 540);
+
         setLocationRelativeTo(null);
         setVisible(true);
     }
 
-    // Need to add scrollbar to this if overflow of task panels
+    // Contains scrollable panel with tasks and new button
     private JPanel createRightPane() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(0, 1, 5, 5));
+        JPanel panel = new JPanel(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1;
+        gbc.weighty = 5;
 
         tasksListPane = new JPanel();
-        tasksListPane.setLayout(new GridLayout(0, 1, 5, 5));
+        tasksListPane.setBackground(Color.white);
+        tasksListPane.setLayout(new BoxLayout(tasksListPane, BoxLayout.Y_AXIS));
 
         // Initialize with any pre-existing tasks
         for (int i = 0; i < tasks.size(); i++) {
             tasksListPane.add(createTaskPanel(tasks.get(i)));
         }
 
-        panel.add(tasksListPane);
+        scrollPane = new JScrollPane(tasksListPane);
+        scrollPane.setAlignmentY(JScrollPane.TOP_ALIGNMENT);
+        panel.add(scrollPane, gbc);
 
+        gbc.anchor = GridBagConstraints.SOUTHEAST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.gridy = 1;
+        gbc.weighty = 0;
+
+        JPanel buttonPane = new JPanel(new GridLayout());
         JButton newButton = new JButton("New");
+        buttonPane.add(newButton);
+        buttonPane.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
 
-        panel.add(newButton);
+        panel.add(buttonPane, gbc);
 
         // Open a new EditItem JFrame
         newButton.addActionListener(new ActionListener() {
@@ -74,7 +106,16 @@ public class SchedulerWindow extends JFrame{
                     public void onSubmitClicked(Task task) {
                         System.out.println("Registered new task: " + task.getName());
                         tasks.add(task);
-                        tasksListPane.add(createTaskPanel(task));
+
+                        GridBagConstraints gbc2 = new GridBagConstraints();
+
+                        gbc2.insets = new Insets(5, 5, 5, 5);
+                        gbc2.gridx = 0;
+                        gbc2.gridy = GridBagConstraints.RELATIVE;
+                        gbc2.anchor = GridBagConstraints.NORTHWEST;
+                        gbc2.fill = GridBagConstraints.HORIZONTAL;
+
+                        tasksListPane.add(createTaskPanel(task), gbc2);
 
                         // redraw everything because we added a component
                         tasksListPane.revalidate();
@@ -84,29 +125,46 @@ public class SchedulerWindow extends JFrame{
             }
         });
 
-        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Tasks"));
+        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY), BorderFactory.createEmptyBorder(5, 5, 5, 5)), "Tasks"));
 
         return panel;
-
-
     }
 
     private JPanel createLeftPane() {
-        JPanel panel = new JPanel();
-
-        panel.setLayout(new GridLayout(0, 2, 5, 5));
+        JPanel panel = new JPanel(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1;
+        gbc.weighty = 5;
+
+        // Replace scheduleDisplay with actual schedule display
+        JPanel scheduleDisplay = new JPanel();
+        scheduleDisplay.setBackground(Color.white);
+        scheduleDisplay.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        panel.add(scheduleDisplay, gbc);
+
+        JPanel leftButtonsPane = new JPanel();
+        leftButtonsPane.setLayout(new BoxLayout(leftButtonsPane, BoxLayout.LINE_AXIS));
 
         JButton previousButton = new JButton("Previous");
         JButton nextButton = new JButton("Next");
 
-        panel.add(previousButton, gbc);
+        leftButtonsPane.add(Box.createHorizontalGlue());
+        leftButtonsPane.add(previousButton, BorderLayout.EAST);
+        leftButtonsPane.add(Box.createRigidArea(new Dimension(10, 0)));
+        leftButtonsPane.add(nextButton, BorderLayout.EAST);
+        leftButtonsPane.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
 
-        gbc.gridy++;
-        panel.add(nextButton, gbc);
+        gbc.gridy = 1;
+        gbc.weighty = 0;
+        panel.add(leftButtonsPane, gbc);
 
-        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Schedule"));
+        panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY), BorderFactory.createEmptyBorder(5, 5, 5, 5)), "Schedule"));
 
         return panel;
     }
@@ -140,20 +198,14 @@ public class SchedulerWindow extends JFrame{
         });
 
         panel.add(taskName);
+        panel.add(Box.createHorizontalGlue());
         panel.add(editButton);
+        panel.add(Box.createRigidArea(new Dimension(5, 0)));
         panel.add(lockButton);
+        panel.add(Box.createRigidArea(new Dimension(5, 0)));
         panel.add(deleteButton);
-        panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         return panel;
-    }
-
-    // Remove task panel from list of tasks
-    public void deleteTask() {
-        // panel.remove();
-    }
-
-    public void updateTask() {
-
     }
 
     private void refreshTaskList() {
