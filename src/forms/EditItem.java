@@ -71,7 +71,7 @@ public class EditItem extends JFrame{
         });
     }
 
-    public EditItem(String newTitle){
+    public EditItem(String newTitle) {
         setTitle(newTitle);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setContentPane(contentPane);
@@ -89,13 +89,19 @@ public class EditItem extends JFrame{
     }
 
 
-    private void saveChanges(){
+    private void saveChanges() {
         System.out.println("Saving changes.");
 
         // Update the task object that we have
+        task.setName(this.Name.getText());
+        task.setStartTime(Integer.parseInt(this.StartTime.getText()));
+        task.setEndTime(Integer.parseInt(this.EndTime.getText()));
+        task.setDuration(Integer.parseInt(this.Duration.getText()));
+        task.setLockStartTime(this.lockRadioButton.isSelected());
+        task.setLockEndTime(this.lockRadioButton1.isSelected());
 
         // Notify the listener with the task object
-        if (saveButtonListener != null){
+        if (saveButtonListener != null) {
             saveButtonListener.onSubmitClicked(task);
         }
 
