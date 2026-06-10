@@ -69,6 +69,7 @@ public class EditItem extends JFrame {
             lockRadioButton.setSelected(task.isLockStartTime());
             lockRadioButton2.setSelected(task.isLockEndTime());
             Priority.setText(String.valueOf(task.getPriority()));
+            Optional.setSelected(task.isOptional());
         }
 
         // Save button event listener
@@ -239,6 +240,7 @@ public class EditItem extends JFrame {
         task.setLockStartTime(lockRadioButton.isSelected());
         task.setLockEndTime(lockRadioButton2.isSelected());
         task.setPriority(Integer.parseInt(Priority.getText()));
+        task.setOptional(Optional.isSelected());
 
         // Notify the listener with the task object
         if (saveButtonListener != null) {
