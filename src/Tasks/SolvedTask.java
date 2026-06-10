@@ -5,6 +5,7 @@ public class SolvedTask {
 
     // Name of the task.
     private String Name;
+    private Task OriginalTask;
     // The given start time for the task in POSIX time.
     private long StartTime;
     // The given end time for the task in POSIX time.
@@ -45,8 +46,12 @@ public class SolvedTask {
     }
 
     // used to calculate the score given priority and desired values
-    public void calculateScore(int priority, long desiredStart, long desiredEnd, long desiredDuration){
+    public void calculateScore(){
         // # TO-DO: DO ACTUAL CALCULATIONS
+        int priority = OriginalTask.getPriority();
+        long desiredStart = OriginalTask.getStartTime();
+        long desiredEnd = OriginalTask.getEndTime();
+
         this.score = priority;
     }
 }
