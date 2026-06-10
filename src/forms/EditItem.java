@@ -50,7 +50,7 @@ public class EditItem extends JFrame {
     private boolean editing;
     private static final DateTimeFormatter DATE_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
+    private List<Task> tasks;
 
     private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder().appendPattern("yyyy-MM-dd").optionalStart().appendLiteral('T').optionalStart().appendPattern("HH:mm").appendLiteral(':').appendValue(ChronoField.SECOND_OF_MINUTE, 2).optionalEnd().toFormatter();
 
@@ -322,6 +322,7 @@ public class EditItem extends JFrame {
             }
         }
 
+        this.tasks = tasks;
         String[] taskNames = new String[tasks.size() + 1];
         taskNames[0] = "[None]";
 
@@ -382,6 +383,27 @@ public class EditItem extends JFrame {
         task.setLockEndTime(lockRadioButton2.isSelected());
         task.setPriority(Integer.parseInt(Priority.getText()));
         task.setOptional(Optional.isSelected());
+
+        // Process dependencies
+        List<List<String>> dependencyLists = List.of(
+                isDependedOn.getSelectedValuesList(),
+                mustImmediatelyFollow.getSelectedValuesList(),
+                mustImmediatelyPrecede.getSelectedValuesList(),
+                mustPrecede.getSelectedValuesList(),
+                mustPrecede.getSelectedValuesList(),
+                mustFollow.getSelectedValuesList(),
+                dependsOn.getSelectedValuesList()
+        );
+
+        for (Task task : tasks) {
+            for (List<String> dependencyList : dependencyLists) {
+                if (dependencyList.equals("[NONE]")) {
+                    break;
+                } else if (dependencyList.contains(task.getName())) {
+                    // todo
+                }
+            }
+        }
 
         // Notify the listener with the task object
         if (saveButtonListener != null) {
