@@ -5,13 +5,23 @@ public class SolvedTask {
 
     // Name of the task.
     private String Name;
-    private Task OriginalTask;
+    private final Task OriginalTask;
     // The given start time for the task in POSIX time.
     private long StartTime;
     // The given end time for the task in POSIX time.
     private long EndTime;
     // The heuristic score of the task.
     private float score;
+
+
+    public SolvedTask(Task originalTask, long startTime, long endTime) {
+        OriginalTask = originalTask;
+        Name = originalTask.getName();
+        StartTime = startTime;
+        EndTime = endTime;
+        calculateScore();
+    }
+
 
     public String getName() {
         return Name;
@@ -48,18 +58,14 @@ public class SolvedTask {
     // used to calculate the score given priority and desired values
     // metric will be priority - penalty, where penalty = sum of difference in hours in terms of start time, end time, and duration
     public void calculateScore(
-            int priority,
-            long desiredStart,
-            long desiredEnd,
-            long desiredDuration
     ) {
-        float calculatedScore = priority;
+        float calculatedScore = OriginalTask.getPriority();
 
         long actualDuration = EndTime - StartTime;
 
-        long startDifference = Math.abs(StartTime - desiredStart);
-        long endDifference = Math.abs(EndTime - desiredEnd);
-        long durationDifference = Math.abs(actualDuration - desiredDuration);
+        long startDifference = Math.abs(StartTime - OriginalTask.getStartTime());
+        long endDifference = Math.abs(EndTime - OriginalTask.getEndTime());
+        long durationDifference = Math.abs(actualDuration - OriginalTask.getDuration());
 
         // difference in hours
         float startPenalty = startDifference / 3600.0f;

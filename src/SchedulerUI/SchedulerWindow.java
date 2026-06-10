@@ -33,6 +33,7 @@ public class SchedulerWindow extends JFrame{
 
     private JTextField scheduleStart;
     private JTextField scheduleEnd;
+    private int maxSolutions = 100;
 
     private static final DateTimeFormatter DATE_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -221,7 +222,7 @@ public class SchedulerWindow extends JFrame{
                 long start = parseDateTime(scheduleStart.getText());
                 long end = parseDateTime(scheduleEnd.getText());
 
-                schedules = solver.GenerateSchedules(tasks, start, end);
+                schedules = solver.GenerateSchedules(tasks, start, end, maxSolutions);
                 currentScheduleIndex = 0;
 
                 refreshScheduleDisplay();

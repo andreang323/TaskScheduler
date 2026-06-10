@@ -6,8 +6,13 @@ public class Schedule implements Comparable <Schedule>{
     private List<SolvedTask> TaskList;
     private float priorityScore;
 
+    public Schedule(List<SolvedTask> taskList) {
+        TaskList = taskList;
+        updatePriorityScore();
+    }
+
     // Sets priority score to a sum of all solved tasks' scores
-    public void updatePriorityScore() {
+    private void updatePriorityScore() {
         priorityScore = 0;
         for(SolvedTask solvedTask : TaskList){
             priorityScore += solvedTask.getScore();
