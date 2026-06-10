@@ -8,6 +8,8 @@ import java.awt.event.ActionListener;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 
 public class EditItem extends JFrame {
@@ -41,14 +43,28 @@ public class EditItem extends JFrame {
     private Task task;
     private LocalDateTime date = LocalDateTime.now();
     private boolean editing;
+    private static final DateTimeFormatter DATE_FORMAT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
 
     public void setupPanel() {
 
         // Update displayed parameters with the task assigned to EditItem
         if (task != null) {
             Name.setText(task.getName());
-            StartTime.setText(String.valueOf(Instant.ofEpochSecond(task.getStartTime())));
-            EndTime.setText(String.valueOf(Instant.ofEpochSecond(task.getEndTime())));
+            StartTime.setText(
+                    Instant.ofEpochSecond(task.getStartTime())
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDateTime()
+                            .format(DATE_FORMAT)
+            );
+
+            EndTime.setText(
+                    Instant.ofEpochSecond(task.getEndTime())
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDateTime()
+                            .format(DATE_FORMAT)
+            );
             Duration.setText(String.valueOf(task.getDuration()));
             lockRadioButton.setSelected(task.isLockStartTime());
             lockRadioButton2.setSelected(task.isLockEndTime());
@@ -169,6 +185,15 @@ public class EditItem extends JFrame {
             createButton.setText("Update");
         } else {
             createButton.setText("Create");
+            long now = Instant.now().getEpochSecond();
+
+            if (task.getStartTime() == 0) {
+                task.setStartTime(now);
+            }
+
+            if (task.getEndTime() == 0) {
+                task.setEndTime(now + 3600);
+            }
         }
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -193,8 +218,23 @@ public class EditItem extends JFrame {
         // Update the task object that we have
         task.setName(Name.getText());
 
-        task.setStartTime(Instant.parse(StartTime.getText()).getEpochSecond());
-        task.setEndTime(Instant.parse(EndTime.getText()).getEpochSecond());
+        task.setStartTime(
+                LocalDateTime.parse(
+                                StartTime.getText(),
+                                DATE_FORMAT
+                        )
+                        .atZone(ZoneId.systemDefault())
+                        .toEpochSecond()
+        );
+
+        task.setEndTime(
+                LocalDateTime.parse(
+                                EndTime.getText(),
+                                DATE_FORMAT
+                        )
+                        .atZone(ZoneId.systemDefault())
+                        .toEpochSecond()
+        );
         task.setDuration(Long.parseLong(Duration.getText()));
         task.setLockStartTime(lockRadioButton.isSelected());
         task.setLockEndTime(lockRadioButton2.isSelected());
