@@ -5,6 +5,7 @@ import Tasks.Task;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -38,6 +39,7 @@ public class EditItem extends JFrame {
     private TimeLockListener timeLockListener;
     private SaveButtonListener saveButtonListener;
     private Task task;
+    private LocalDateTime date = LocalDateTime.now();
     private boolean editing;
 
     public void setupPanel() {
@@ -45,18 +47,13 @@ public class EditItem extends JFrame {
         // Update displayed parameters with the task assigned to EditItem
         if (task != null) {
             Name.setText(task.getName());
-            StartTime.setText(task.getStartTime());
-            EndTime.setText(task.getEndTime());
-            Duration.setText(task.getDuration());
+            StartTime.setText(String.valueOf(Instant.ofEpochSecond(task.getStartTime())));
+            EndTime.setText(String.valueOf(Instant.ofEpochSecond(task.getEndTime())));
+            Duration.setText(String.valueOf(task.getDuration()));
             lockRadioButton.setSelected(task.isLockStartTime());
             lockRadioButton2.setSelected(task.isLockEndTime());
+            Priority.setText(String.valueOf(task.getPriority()));
         }
-
-        // Set up lock listeners here
-//        timeLockListener = new TimeLockListener();
-//        lockRadioButton.addActionListener(timeLockListener);
-//        lockRadioButton1.addActionListener(timeLockListener);
-//        lockRadioButton2.addActionListener(timeLockListener);
 
         // Save button event listener
         createButton.addActionListener(new ActionListener() {
@@ -195,11 +192,13 @@ public class EditItem extends JFrame {
 
         // Update the task object that we have
         task.setName(Name.getText());
-        task.setStartTime(StartTime.getText());
-        task.setEndTime(EndTime.getText());
-        task.setDuration(Duration.getText());
+
+        task.setStartTime(Instant.parse(StartTime.getText()).getEpochSecond());
+        task.setEndTime(Instant.parse(EndTime.getText()).getEpochSecond());
+        task.setDuration(Long.parseLong(Duration.getText()));
         task.setLockStartTime(lockRadioButton.isSelected());
         task.setLockEndTime(lockRadioButton2.isSelected());
+        task.setPriority(Integer.parseInt(Priority.getText()));
 
         // Notify the listener with the task object
         if (saveButtonListener != null) {

@@ -18,6 +18,8 @@ public class SchedulerWindow extends JFrame{
     private JScrollPane scrollPane;
     private JPanel tasksListPane;
     private List<Task> tasks;
+
+    private int nextTaskID = 0;
     
     public SchedulerWindow(){
         setTitle("Task Scheduler");
@@ -105,6 +107,8 @@ public class SchedulerWindow extends JFrame{
                     @Override
                     public void onSubmitClicked(Task task) {
                         System.out.println("Registered new task: " + task.getName());
+                        task.setTaskID(nextTaskID);
+                        nextTaskID++;
                         tasks.add(task);
 
                         GridBagConstraints gbc2 = new GridBagConstraints();
@@ -151,12 +155,22 @@ public class SchedulerWindow extends JFrame{
         JPanel leftButtonsPane = new JPanel();
         leftButtonsPane.setLayout(new BoxLayout(leftButtonsPane, BoxLayout.LINE_AXIS));
 
+        JTextField scheduleStart = new JTextField();
+        JTextField scheduleEnd = new JTextField();
+        JButton scheduleTimeUpdateButton = new JButton("Update");
+
         JButton previousButton = new JButton("Previous");
         JButton nextButton = new JButton("Next");
 
+        leftButtonsPane.add(scheduleStart, BorderLayout.WEST);
+        leftButtonsPane.add(Box.createRigidArea(new Dimension(5, 0)));
+        leftButtonsPane.add(scheduleEnd, BorderLayout.WEST);
+        leftButtonsPane.add(Box.createRigidArea(new Dimension(5, 0)));
+        leftButtonsPane.add(scheduleTimeUpdateButton, BorderLayout.WEST);
         leftButtonsPane.add(Box.createHorizontalGlue());
+        leftButtonsPane.add(Box.createRigidArea(new Dimension(5, 0)));
         leftButtonsPane.add(previousButton, BorderLayout.EAST);
-        leftButtonsPane.add(Box.createRigidArea(new Dimension(10, 0)));
+        leftButtonsPane.add(Box.createRigidArea(new Dimension(5, 0)));
         leftButtonsPane.add(nextButton, BorderLayout.EAST);
         leftButtonsPane.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
 
