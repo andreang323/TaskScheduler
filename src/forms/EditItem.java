@@ -339,6 +339,7 @@ public class EditItem extends JFrame {
             taskNames[i + 1] = tasks.get(i).getName();
         }
 
+        // FIXME: Does not select tasks on edit
         isDependedOn.setListData(taskNames);
         mustImmediatelyFollow.setListData(taskNames);
         mustImmediatelyPrecede.setListData(taskNames);
@@ -412,7 +413,7 @@ public class EditItem extends JFrame {
         // Iterate over tasks to check
         List<TaskDependency> dependencies = new ArrayList<TaskDependency>();
         for (Task task : tasks) {
-            // Iterate over depednacy types
+            // Iterate over dependency types
             for (int i = 0; i < dependencyLists.size(); i++) {
                 // Iterate over dependencies of each type
                 for (String name : dependencyLists.get(i)) {
