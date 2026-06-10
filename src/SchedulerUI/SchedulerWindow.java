@@ -1,6 +1,8 @@
 package SchedulerUI;
 
+import Tasks.Schedule;
 import Tasks.Task;
+import Tasks.SolvedTask;
 import forms.EditItem;
 import forms.SaveButtonListener;
 
@@ -8,6 +10,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,11 +26,22 @@ public class SchedulerWindow extends JFrame{
     private List<Task> tasks;
 
     private int nextTaskID = 0;
+    private JPanel scheduleListPane;
+    private JScrollPane scheduleScrollPane;
+    private List<Schedule> schedules;
+    private int currentScheduleIndex = 0;
+
+    private JTextField scheduleStart;
+    private JTextField scheduleEnd;
+
+    private static final DateTimeFormatter DATE_FORMAT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     
     public SchedulerWindow(){
         setTitle("Task Scheduler");
 
         tasks = new ArrayList<>();
+        schedules = new ArrayList<>();
 
         contentPane = new JPanel();
         contentPane.setLayout(new GridBagLayout());
@@ -70,9 +87,9 @@ public class SchedulerWindow extends JFrame{
         tasksListPane.setLayout(new BoxLayout(tasksListPane, BoxLayout.Y_AXIS));
 
         // Initialize with any pre-existing tasks
-        for (int i = 0; i < tasks.size(); i++) {
-            tasksListPane.add(createTaskPanel(tasks.get(i)));
-        }
+//        for (int i = 0; i < tasks.size(); i++) {
+//            tasksListPane.add(createTaskPanel(tasks.get(i)));
+//        }
 
         scrollPane = new JScrollPane(tasksListPane);
         scrollPane.setAlignmentY(JScrollPane.TOP_ALIGNMENT);
@@ -147,25 +164,89 @@ public class SchedulerWindow extends JFrame{
         gbc.weighty = 5;
 
         // Replace scheduleDisplay with actual schedule display
-        JPanel scheduleDisplay = new JPanel();
-        scheduleDisplay.setBackground(Color.white);
-        scheduleDisplay.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        panel.add(scheduleDisplay, gbc);
+        scheduleListPane = new JPanel();
+        scheduleListPane.setBackground(Color.white);
+        scheduleListPane.setLayout(new BoxLayout(scheduleListPane, BoxLayout.Y_AXIS));
+
+        scheduleScrollPane = new JScrollPane(scheduleListPane);
+        scheduleScrollPane.setAlignmentY(JScrollPane.TOP_ALIGNMENT);
+        scheduleScrollPane.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+
+        panel.add(scheduleScrollPane, gbc);
+
+        LocalDateTime now = LocalDateTime.now();
+
+        scheduleStart = new JTextField(
+                now.format(DATE_FORMAT)
+        );
+
+        scheduleEnd = new JTextField(
+                now.plusDays(7).format(DATE_FORMAT)
+        );
 
         JPanel leftButtonsPane = new JPanel();
         leftButtonsPane.setLayout(new BoxLayout(leftButtonsPane, BoxLayout.LINE_AXIS));
 
-        JTextField scheduleStart = new JTextField();
-        JTextField scheduleEnd = new JTextField();
+
         JButton scheduleTimeUpdateButton = new JButton("Update");
 
         JButton previousButton = new JButton("Previous");
-        JButton nextButton = new JButton("Next");
+        previousButton.addActionListener(e -> {
+            if (schedules.isEmpty()) {
+                return;
+            }
+            currentScheduleIndex --;
+            if (currentScheduleIndex < 0) {
+                currentScheduleIndex = schedules.size() -1;
+            }
+            refreshScheduleDisplay();
+        });
 
+        JButton nextButton = new JButton("Next");
+        nextButton.addActionListener(e -> {
+            if (schedules.isEmpty()) {
+                return;
+            }
+            currentScheduleIndex ++;
+            if (currentScheduleIndex >= schedules.size()) {
+                currentScheduleIndex = 0;
+            }
+            refreshScheduleDisplay();
+        });
+
+        scheduleTimeUpdateButton.addActionListener(e -> {
+            try {
+                ScheduleSolver solver = new ScheduleSolver();
+
+                long start = parseDateTime(scheduleStart.getText());
+                long end = parseDateTime(scheduleEnd.getText());
+
+                schedules = solver.GenerateSchedules(tasks, start, end);
+                currentScheduleIndex = 0;
+
+                refreshScheduleDisplay();
+            }
+            catch (Exception ex) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Use format: yyyy-MM-dd HH:mm\nExample: 2026-06-09 08:00",
+                        "Invalid Date",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
+
+        JLabel scheduleStartLabel = new JLabel("Schedule Start:");
+        JLabel scheduleEndLabel = new JLabel("Schedule End:");
+
+        leftButtonsPane.add(scheduleStartLabel);
+        leftButtonsPane.add(Box.createRigidArea(new Dimension(5, 0)));
         leftButtonsPane.add(scheduleStart, BorderLayout.WEST);
+        leftButtonsPane.add(Box.createRigidArea(new Dimension(10, 0)));
+        leftButtonsPane.add(scheduleEndLabel);
         leftButtonsPane.add(Box.createRigidArea(new Dimension(5, 0)));
         leftButtonsPane.add(scheduleEnd, BorderLayout.WEST);
-        leftButtonsPane.add(Box.createRigidArea(new Dimension(5, 0)));
+
         leftButtonsPane.add(scheduleTimeUpdateButton, BorderLayout.WEST);
         leftButtonsPane.add(Box.createHorizontalGlue());
         leftButtonsPane.add(Box.createRigidArea(new Dimension(5, 0)));
@@ -232,6 +313,70 @@ public class SchedulerWindow extends JFrame{
 
         tasksListPane.revalidate();
         tasksListPane.repaint();
+    }
+
+    private void refreshScheduleDisplay() {
+        scheduleListPane.removeAll();
+
+        if (schedules.isEmpty()) {
+            scheduleListPane.add(new JLabel("No schedules generated yet."));
+        } else {
+            Schedule currentSchedule = schedules.get(currentScheduleIndex);
+
+            JLabel header = new JLabel(
+                    "Schedule " + (currentScheduleIndex + 1)
+                            + " of " + schedules.size()
+            );
+
+            header.setBorder(BorderFactory.createEmptyBorder(5, 5, 10, 5));
+            scheduleListPane.add(header);
+
+            for (SolvedTask solvedTask : currentSchedule.getTaskList()) {
+                scheduleListPane.add(createSolvedTaskPanel(solvedTask));
+                scheduleListPane.add(Box.createRigidArea(new Dimension(0, 5)));
+            }
+        }
+
+        scheduleListPane.revalidate();
+        scheduleListPane.repaint();
+    }
+
+    private JPanel createSolvedTaskPanel(SolvedTask solvedTask) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        //setting to center alignment is kinda ugly
+        //panel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.setBorder(
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(Color.GRAY),
+                        BorderFactory.createEmptyBorder(5, 5, 5, 5)
+                )
+        );
+
+        panel.add(new JLabel("Task: " + solvedTask.getName()));
+        panel.add(new JLabel("Start: " + formatUnixTime(solvedTask.getStartTime())));
+        panel.add(new JLabel("End: " + formatUnixTime(solvedTask.getEndTime())));
+
+        return panel;
+    }
+
+    private long parseDateTime(String text) {
+        LocalDateTime dateTime =
+                LocalDateTime.parse(
+                        text,
+                        DATE_FORMAT
+                );
+
+        return dateTime
+                .atZone(ZoneId.systemDefault())
+                .toEpochSecond();
+    }
+
+    private String formatUnixTime(long unixTime) {
+        return LocalDateTime.ofInstant(
+                Instant.ofEpochSecond(unixTime),
+                ZoneId.systemDefault()
+        ).format(DATE_FORMAT);
     }
 
 }
