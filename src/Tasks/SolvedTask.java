@@ -43,4 +43,10 @@ public class SolvedTask {
     public void setScore(float score) {
         this.score = score;
     }
+
+    // used to calculate the score given priority and desired values
+    public void calculateScore(int priority, long desiredStart, long desiredEnd, long desiredDuration){
+        // # TO-DO: DO ACTUAL CALCULATIONS
+        this.score = priority;
+    }
 }
