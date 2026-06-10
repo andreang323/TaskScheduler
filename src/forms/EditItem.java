@@ -33,13 +33,13 @@ public class EditItem extends JFrame {
     private JList list5;
     private JList Group;
     private JButton validateButton;
-    private JFormattedTextField formattedTextField1;
     private JCheckBox Optional;
     private JCheckBox skipDependentTaskIfCheckBox;
     private JCheckBox reduceDurationOfThisCheckBox;
     private JTextField textField1;
     private JLabel timeNote1;
     private JLabel timeNote2;
+    private JEditorPane description;
     private TimeLockListener timeLockListener;
     private SaveButtonListener saveButtonListener;
     private Task task;
