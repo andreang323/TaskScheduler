@@ -66,13 +66,9 @@ public class SolvedTask {
         float endPenalty = endDifference / 3600.0f;
         float durationPenalty = durationDifference / 3600.0f;
 
-        calculatedScore -= startPenalty;
-        calculatedScore -= endPenalty;
-        calculatedScore -= durationPenalty;
+        float totalPenalty = startPenalty + endPenalty + durationPenalty;
 
-        if (calculatedScore < 0) {
-            calculatedScore = 0;
-        }
+        calculatedScore = calculatedScore / (1.0f + totalPenalty);
 
         this.score = calculatedScore;
     }
