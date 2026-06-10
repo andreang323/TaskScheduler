@@ -46,12 +46,34 @@ public class SolvedTask {
     }
 
     // used to calculate the score given priority and desired values
-    public void calculateScore(){
-        // # TO-DO: DO ACTUAL CALCULATIONS
-        int priority = OriginalTask.getPriority();
-        long desiredStart = OriginalTask.getStartTime();
-        long desiredEnd = OriginalTask.getEndTime();
+    // metric will be priority - penalty, where penalty = sum of difference in hours in terms of start time, end time, and duration
+    public void calculateScore(
+            int priority,
+            long desiredStart,
+            long desiredEnd,
+            long desiredDuration
+    ) {
+        float calculatedScore = priority;
 
-        this.score = priority;
+        long actualDuration = EndTime - StartTime;
+
+        long startDifference = Math.abs(StartTime - desiredStart);
+        long endDifference = Math.abs(EndTime - desiredEnd);
+        long durationDifference = Math.abs(actualDuration - desiredDuration);
+
+        // difference in hours
+        float startPenalty = startDifference / 3600.0f;
+        float endPenalty = endDifference / 3600.0f;
+        float durationPenalty = durationDifference / 3600.0f;
+
+        calculatedScore -= startPenalty;
+        calculatedScore -= endPenalty;
+        calculatedScore -= durationPenalty;
+
+        if (calculatedScore < 0) {
+            calculatedScore = 0;
+        }
+
+        this.score = calculatedScore;
     }
 }
