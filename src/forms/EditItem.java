@@ -51,13 +51,7 @@ public class EditItem extends JFrame {
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 
-    private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
-            .appendPattern("yyyy-MM-dd HH:mm")
-            .optionalStart()
-            .appendLiteral(':')
-            .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
-            .optionalEnd()
-            .toFormatter();
+    private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder().appendPattern("yyyy-MM-dd").optionalStart().appendLiteral('T').optionalStart().appendPattern("HH:mm").appendLiteral(':').appendValue(ChronoField.SECOND_OF_MINUTE, 2).optionalEnd().toFormatter();
 
     public void setupPanel() {
 
@@ -77,6 +71,8 @@ public class EditItem extends JFrame {
                             .toLocalDateTime()
                             .format(DATE_FORMAT)
             );
+            // StartTime.setText(LocalDateTime.ofInstant(Instant.ofEpochSecond(task.getStartTime()), java.time.ZoneId.systemDefault()).format(FORMATTER));
+            // EndTime.setText(LocalDateTime.ofInstant(Instant.ofEpochSecond(task.getEndTime()), java.time.ZoneId.systemDefault()).format(FORMATTER));
             Duration.setText(String.valueOf(task.getDuration()));
             lockRadioButton.setSelected(task.isLockStartTime());
             lockRadioButton2.setSelected(task.isLockEndTime());
@@ -133,7 +129,7 @@ public class EditItem extends JFrame {
             System.out.println("Invalid Start Time Format: " + StartTime.getText());
             return;
         }
-        LocalDateTime startDate = LocalDateTime.parse("2000-01-01 00:00:00", FORMATTER);
+        LocalDateTime startDate = LocalDateTime.parse("2000-01-01T00:00:00", FORMATTER);
         try {
             startDate = LocalDateTime.parse(StartTime.getText(), FORMATTER);
         } catch (DateTimeParseException e) {
@@ -144,7 +140,7 @@ public class EditItem extends JFrame {
         if (!EndTime.getText().isEmpty()) {
             endDate = LocalDateTime.parse(EndTime.getText(), FORMATTER);
         }
-        LocalDateTime durationAsDate = LocalDateTime.parse("2000-01-01 00:00:00", FORMATTER);
+        LocalDateTime durationAsDate = LocalDateTime.parse("2000-01-01T00:00:00", FORMATTER);
         if (!Duration.getText().isEmpty()) {
             durationAsDate = LocalDateTime.parse(Duration.getText(), FORMATTER);
         }
@@ -168,14 +164,14 @@ public class EditItem extends JFrame {
         System.out.println("EndTime Changed");
 
         if (EndTime.getText().isEmpty()) {
-            System.out.println("Invalid Ends Time Format" + EndTime.getText());
+            System.out.println("Invalid Ends Time Format: " + EndTime.getText());
             return;
         }
-        LocalDateTime endDate = LocalDateTime.parse("2000-01-01 00:00:00", FORMATTER);
+        LocalDateTime endDate = LocalDateTime.parse("2000-01-01T00:00:00", FORMATTER);
         try {
             endDate = LocalDateTime.parse(EndTime.getText(), FORMATTER);
         } catch (DateTimeParseException e) {
-            System.out.println("Invalid Ends Time Format" + EndTime.getText());
+            System.out.println("Invalid Ends Time Format: " + EndTime.getText());
             return;
         }
 
@@ -183,7 +179,7 @@ public class EditItem extends JFrame {
         if (!StartTime.getText().isEmpty()) {
             startDate = LocalDateTime.parse(StartTime.getText(), FORMATTER);
         }
-        LocalDateTime durationAsDate = LocalDateTime.parse("2000-01-01 00:00:00", FORMATTER);
+        LocalDateTime durationAsDate = LocalDateTime.parse("2000-01-01T00:00:00", FORMATTER);
         if (!Duration.getText().isEmpty()) {
             durationAsDate = LocalDateTime.parse(Duration.getText(), FORMATTER);
         }
@@ -210,16 +206,16 @@ public class EditItem extends JFrame {
             System.out.println("Invalid Duration Time Format: " + Duration.getText());
             return;
         }
-        LocalDateTime durationAsDate = LocalDateTime.parse("2000-01-01 00:00:00", FORMATTER); // FIXME! Don't want it to be 2000 years lol
+        LocalDateTime durationAsDate = LocalDateTime.parse("2000-01-01T00:00:00", FORMATTER); // FIXME! Don't want it to be 2000 years lol
         try {
             durationAsDate = LocalDateTime.parse(Duration.getText(), FORMATTER);
         } catch (DateTimeParseException e) {
             System.out.println("Invalid Duration Time Format: " + Duration.getText());
             return;
         }
-        long durationSeconds = Math.abs(durationAsDate.until(LocalDateTime.parse("2000-01-01 00:00:00", FORMATTER), ChronoUnit.SECONDS));
+        long durationSeconds = Math.abs(durationAsDate.until(LocalDateTime.parse("2000-01-01T00:00:00", FORMATTER), ChronoUnit.SECONDS));
 
-        LocalDateTime startDate = LocalDateTime.parse("2000-01-01 00:00:00", FORMATTER);
+        LocalDateTime startDate = LocalDateTime.parse("2000-01-01T00:00:00", FORMATTER);
         if (!StartTime.getText().isEmpty()) {
             startDate = LocalDateTime.parse(StartTime.getText(), FORMATTER);
 
