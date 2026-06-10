@@ -1,18 +1,25 @@
 package forms;
 
 import Tasks.Task;
+import Tasks.TaskDependency;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.Instant;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.ZoneId;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 
@@ -74,6 +81,8 @@ public class EditItem extends JFrame {
             );
             // StartTime.setText(LocalDateTime.ofInstant(Instant.ofEpochSecond(task.getStartTime()), java.time.ZoneId.systemDefault()).format(FORMATTER));
             // EndTime.setText(LocalDateTime.ofInstant(Instant.ofEpochSecond(task.getEndTime()), java.time.ZoneId.systemDefault()).format(FORMATTER));
+            // StartTime.setText(LocalDateTime.ofInstant(Instant.ofEpochSecond(task.getStartTime()), ZoneId.systemDefault()).format(FORMATTER));
+            // EndTime.setText(LocalDateTime.ofInstant(Instant.ofEpochSecond(task.getEndTime()), ZoneId.systemDefault()).format(FORMATTER));
             Duration.setText(String.valueOf(task.getDuration()));
             lockRadioButton.setSelected(task.isLockStartTime());
             lockRadioButton2.setSelected(task.isLockEndTime());
@@ -99,25 +108,25 @@ public class EditItem extends JFrame {
         });
 
         StartTime.addActionListener(e -> handleStartTimeChange());
-        StartTime.addFocusListener(new java.awt.event.FocusAdapter() {
+        StartTime.addFocusListener(new FocusAdapter() {
             @Override
-            public void focusLost(java.awt.event.FocusEvent e) {
+            public void focusLost(FocusEvent e) {
                 handleStartTimeChange();
             }
         });
 
         EndTime.addActionListener(e -> handleEndTimeChange());
-        EndTime.addFocusListener(new java.awt.event.FocusAdapter() {
+        EndTime.addFocusListener(new FocusAdapter() {
             @Override
-            public void focusLost(java.awt.event.FocusEvent e) {
+            public void focusLost(FocusEvent e) {
                 handleEndTimeChange();
             }
         });
 
         Duration.addActionListener(e -> handleDurationChange());
-        Duration.addFocusListener(new java.awt.event.FocusAdapter() {
+        Duration.addFocusListener(new FocusAdapter() {
             @Override
-            public void focusLost(java.awt.event.FocusEvent e) {
+            public void focusLost(FocusEvent e) {
                 handleDurationChange();
             }
         });
@@ -386,24 +395,39 @@ public class EditItem extends JFrame {
 
         // Process dependencies
         List<List<String>> dependencyLists = List.of(
-                isDependedOn.getSelectedValuesList(),
+//                isDependedOn.getSelectedValuesList(),
                 mustImmediatelyFollow.getSelectedValuesList(),
                 mustImmediatelyPrecede.getSelectedValuesList(),
                 mustPrecede.getSelectedValuesList(),
-                mustPrecede.getSelectedValuesList(),
-                mustFollow.getSelectedValuesList(),
-                dependsOn.getSelectedValuesList()
+                mustFollow.getSelectedValuesList() //,
+//                dependsOn.getSelectedValuesList()
+        );
+        List<TaskDependency.DependencyType> dependencyTypes = List.of(
+                TaskDependency.DependencyType.IMMEDIATELY_AFTER,
+                TaskDependency.DependencyType.IMMEDIATELY_BEFORE,
+                TaskDependency.DependencyType.LOOSELY_BEFORE,
+                TaskDependency.DependencyType.LOOSELY_AFTER
         );
 
+        // Iterate over tasks to check
+        List<TaskDependency> dependencies = new ArrayList<TaskDependency>();
         for (Task task : tasks) {
-            for (List<String> dependencyList : dependencyLists) {
-                if (dependencyList.equals("[NONE]")) {
-                    break;
-                } else if (dependencyList.contains(task.getName())) {
-                    // todo
+            // Iterate over depednacy types
+            for (int i = 0; i < dependencyLists.size(); i++) {
+                // Iterate over dependencies of each type
+                for (String name : dependencyLists.get(i)) {
+                    if (name.equals("[NONE")) {
+                        break;
+                    } else if (name.equals(task.getName())) {
+                        TaskDependency dependency = new TaskDependency();
+                        dependency.setDependencyTaskID(task.getTaskID());
+                        dependency.setType(dependencyTypes.get(i));
+                        dependencies.add(dependency);
+                    }
                 }
             }
         }
+        this.task.setDependencies(dependencies);
 
         // Notify the listener with the task object
         if (saveButtonListener != null) {
