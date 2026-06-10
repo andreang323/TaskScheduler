@@ -1,5 +1,6 @@
 package Tasks;
 
+import java.util.Collections;
 import java.util.List;
 
 public class Schedule implements Comparable <Schedule>{
@@ -7,6 +8,7 @@ public class Schedule implements Comparable <Schedule>{
     private float priorityScore;
 
     public Schedule(List<SolvedTask> taskList) {
+        Collections.sort(taskList);
         TaskList = taskList;
         updatePriorityScore();
     }

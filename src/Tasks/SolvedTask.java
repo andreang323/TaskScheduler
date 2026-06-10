@@ -1,7 +1,7 @@
 package Tasks;
 
 // Class used to store the name, start and end time, and score of a solved task.
-public class SolvedTask {
+public class SolvedTask implements Comparable <SolvedTask>{
 
     // Name of the task.
     private String Name;
@@ -53,6 +53,11 @@ public class SolvedTask {
 
     public void setScore(float score) {
         this.score = score;
+    }
+
+    @Override
+    public int compareTo(SolvedTask otherTask){
+        return Float.compare(getStartTime(), otherTask.getStartTime());
     }
 
     // used to calculate the score given priority and desired values
