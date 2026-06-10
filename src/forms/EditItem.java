@@ -2,18 +2,19 @@ package forms;
 
 import Tasks.Task;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.time.Instant;
-import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
+import javax.swing.*;
 
 
 public class EditItem extends JFrame {
@@ -28,12 +29,12 @@ public class EditItem extends JFrame {
     private JRadioButton lockRadioButton1;
     private JRadioButton lockRadioButton2;
     private JTextField Priority;
-    private JList list1;
-    private JList list2;
-    private JList list3;
-    private JList list4;
-    private JList list5;
-    private JList Group;
+    private JList<String> isDependedOn;
+    private JList<String> mustImmediatelyFollow;
+    private JList<String> mustImmediatelyPrecede;
+    private JList<String> mustPrecede;
+    private JList<String> mustFollow;
+    private JList<String> dependsOn;
     private JButton validateButton;
     private JCheckBox Optional;
     private JCheckBox skipDependentTaskIfCheckBox;
@@ -302,7 +303,7 @@ public class EditItem extends JFrame {
         return durationString;
     }
 
-    public EditItem(String newTitle, Task newTask, boolean editing) {
+    public EditItem(String newTitle, Task newTask, boolean editing, List<Task> tasks) {
         this.task = newTask;
 
         setTitle(newTitle);
@@ -320,6 +321,20 @@ public class EditItem extends JFrame {
                 task.setEndTime(now + 3600);
             }
         }
+
+        String[] taskNames = new String[tasks.size() + 1];
+        taskNames[0] = "[None]";
+
+        for (int i = 0; i < tasks.size(); i++) {
+            taskNames[i + 1] = tasks.get(i).getName();
+        }
+
+        isDependedOn.setListData(taskNames);
+        mustImmediatelyFollow.setListData(taskNames);
+        mustImmediatelyPrecede.setListData(taskNames);
+        mustPrecede.setListData(taskNames);
+        mustFollow.setListData(taskNames);
+        dependsOn.setListData(taskNames);
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setContentPane(contentPane);
@@ -360,6 +375,8 @@ public class EditItem extends JFrame {
                         .atZone(ZoneId.systemDefault())
                         .toEpochSecond()
         );
+        // task.setStartTime(Instant.parse(StartTime.getText()).getEpochSecond()); // FIXME! Form validation does not expect timezone Z but required here
+        // task.setEndTime(Instant.parse(EndTime.getText()).getEpochSecond());
         task.setDuration(Long.parseLong(Duration.getText()));
         task.setLockStartTime(lockRadioButton.isSelected());
         task.setLockEndTime(lockRadioButton2.isSelected());

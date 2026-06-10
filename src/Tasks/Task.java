@@ -120,4 +120,9 @@ public class Task {
         newCopy.taskID = taskID;
         return newCopy;
     }
+    
+    @Override
+    public String toString() {
+        return Name;
+    }
 }

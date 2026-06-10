@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SchedulerWindow extends JFrame{
+public class SchedulerWindow extends JFrame {
     private JPanel contentPane;
     private JPanel leftPane;
     private JPanel rightPane;
@@ -56,9 +56,9 @@ public class SchedulerWindow extends JFrame{
 
         leftPane = createLeftPane();
         rightPane = createRightPane();
-        contentPane.add(leftPane,gbc );
+        contentPane.add(leftPane, gbc);
         gbc.weightx = 1;
-        gbc.gridx ++;
+        gbc.gridx++;
         contentPane.add(rightPane, gbc);
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -118,7 +118,7 @@ public class SchedulerWindow extends JFrame{
                 Task newTask = new Task();
                 newTask.setName("Task " + (tasks.size() + 1));
 
-                EditItem addItem = new EditItem("Adding new task:", newTask, false);
+                EditItem addItem = new EditItem("Adding new task:", newTask, false, tasks);
                 addItem.setVisible(true);
 
                 // Callback so that addItem can add the task properly
@@ -197,9 +197,9 @@ public class SchedulerWindow extends JFrame{
             if (schedules.isEmpty()) {
                 return;
             }
-            currentScheduleIndex --;
+            currentScheduleIndex--;
             if (currentScheduleIndex < 0) {
-                currentScheduleIndex = schedules.size() -1;
+                currentScheduleIndex = schedules.size() - 1;
             }
             refreshScheduleDisplay();
         });
@@ -209,7 +209,7 @@ public class SchedulerWindow extends JFrame{
             if (schedules.isEmpty()) {
                 return;
             }
-            currentScheduleIndex ++;
+            currentScheduleIndex++;
             if (currentScheduleIndex >= schedules.size()) {
                 currentScheduleIndex = 0;
             }
@@ -269,7 +269,7 @@ public class SchedulerWindow extends JFrame{
         JButton deleteButton = new JButton("Delete");
 
         editButton.addActionListener(e -> {
-            EditItem editItem = new EditItem("Editing Task: " + task.getName(), task, true);
+            EditItem editItem = new EditItem("Editing Task: " + task.getName(), task, true, tasks);
 
             editItem.setVisible(true);
 

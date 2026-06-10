@@ -69,7 +69,7 @@
           </grid>
         </constraints>
       </vspacer>
-      <component id="3e60a" class="javax.swing.JList" binding="list2" default-binding="true">
+      <component id="3e60a" class="javax.swing.JList" binding="mustImmediatelyFollow">
         <constraints>
           <grid row="6" column="2" row-span="1" col-span="1" vsize-policy="6" hsize-policy="2" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="50"/>
@@ -115,7 +115,7 @@
           <text value="Skip dependent task if completed"/>
         </properties>
       </component>
-      <component id="49059" class="javax.swing.JList" binding="Group">
+      <component id="49059" class="javax.swing.JList" binding="dependsOn">
         <constraints>
           <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="6" hsize-policy="2" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="50"/>
@@ -125,6 +125,7 @@
           <model>
             <item value="[NONE]"/>
           </model>
+          <selectionMode value="2"/>
         </properties>
       </component>
       <component id="80ebc" class="javax.swing.JLabel">
@@ -143,7 +144,7 @@
           <text value="Is Depended On"/>
         </properties>
       </component>
-      <component id="79c1f" class="javax.swing.JList" binding="list1" default-binding="true">
+      <component id="79c1f" class="javax.swing.JList" binding="isDependedOn">
         <constraints>
           <grid row="5" column="2" row-span="1" col-span="1" vsize-policy="6" hsize-policy="2" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="50"/>
@@ -171,7 +172,7 @@
           <text value="Must Immediately Precede"/>
         </properties>
       </component>
-      <component id="d9182" class="javax.swing.JList" binding="list3" default-binding="true">
+      <component id="d9182" class="javax.swing.JList" binding="mustImmediatelyPrecede">
         <constraints>
           <grid row="6" column="4" row-span="1" col-span="1" vsize-policy="6" hsize-policy="2" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="50"/>
@@ -183,7 +184,7 @@
           </model>
         </properties>
       </component>
-      <component id="1ca8d" class="javax.swing.JList" binding="list4" default-binding="true">
+      <component id="1ca8d" class="javax.swing.JList" binding="mustPrecede">
         <constraints>
           <grid row="7" column="4" row-span="1" col-span="1" vsize-policy="6" hsize-policy="2" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="50"/>
@@ -211,7 +212,7 @@
           <text value="Must Follow"/>
         </properties>
       </component>
-      <component id="85760" class="javax.swing.JList" binding="list5" default-binding="true">
+      <component id="85760" class="javax.swing.JList" binding="mustFollow">
         <constraints>
           <grid row="7" column="2" row-span="1" col-span="1" vsize-policy="6" hsize-policy="2" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="50"/>
