@@ -48,6 +48,12 @@ public class ScheduleSolver {
             s.add(ctx.mkGe(currentTask.taskStart, ctx.mkInt(scheduleStart)));
             // end time <= scheduleEnd
             s.add(ctx.mkLe(currentTask.taskEnd, ctx.mkInt(scheduleEnd)));
+            // start time >= taskStart
+            s.add(ctx.mkGe(currentTask.taskStart, ctx.mkInt(task.getStartTime())));
+            System.out.println(task.getStartTime());
+            // end time <= taskEnd
+            System.out.println(task.getEndTime());
+            s.add(ctx.mkLe(currentTask.taskEnd, ctx.mkInt(task.getEndTime())));
             // end time > start time
             s.add(ctx.mkGt(currentTask.taskEnd, currentTask.taskStart));
             // end time - start time = duration
