@@ -8,7 +8,9 @@ import java.awt.event.ActionListener;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -49,7 +51,13 @@ public class EditItem extends JFrame {
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
+            .appendPattern("yyyy-MM-dd HH:mm")
+            .optionalStart()
+            .appendLiteral(':')
+            .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+            .optionalEnd()
+            .toFormatter();
 
     public void setupPanel() {
 
@@ -122,18 +130,19 @@ public class EditItem extends JFrame {
         // StartTime changed
         System.out.println("StartTime Changed");
         if (StartTime.getText().isEmpty()) {
+            System.out.println("Invalid Start Time Format: " + StartTime.getText());
             return;
         }
         LocalDateTime startDate = LocalDateTime.parse("2000-01-01 00:00:00", FORMATTER);
         try {
             startDate = LocalDateTime.parse(StartTime.getText(), FORMATTER);
         } catch (DateTimeParseException e) {
-            System.out.println("Invalid Start Time Format");
+            System.out.println("Invalid Start Time Format: " + StartTime.getText());
             return;
         }
         LocalDateTime endDate = startDate.plusHours(1);
         if (!EndTime.getText().isEmpty()) {
-            endDate = LocalDateTime.parse(EndTime.getText());
+            endDate = LocalDateTime.parse(EndTime.getText(), FORMATTER);
         }
         LocalDateTime durationAsDate = LocalDateTime.parse("2000-01-01 00:00:00", FORMATTER);
         if (!Duration.getText().isEmpty()) {
@@ -159,13 +168,14 @@ public class EditItem extends JFrame {
         System.out.println("EndTime Changed");
 
         if (EndTime.getText().isEmpty()) {
+            System.out.println("Invalid Ends Time Format" + EndTime.getText());
             return;
         }
         LocalDateTime endDate = LocalDateTime.parse("2000-01-01 00:00:00", FORMATTER);
         try {
             endDate = LocalDateTime.parse(EndTime.getText(), FORMATTER);
         } catch (DateTimeParseException e) {
-            System.out.println("Invalid Ends Time Format");
+            System.out.println("Invalid Ends Time Format" + EndTime.getText());
             return;
         }
 
@@ -197,13 +207,14 @@ public class EditItem extends JFrame {
         System.out.println("Duration Changed");
 
         if (Duration.getText().isEmpty()) {
+            System.out.println("Invalid Duration Time Format: " + Duration.getText());
             return;
         }
         LocalDateTime durationAsDate = LocalDateTime.parse("2000-01-01 00:00:00", FORMATTER); // FIXME! Don't want it to be 2000 years lol
         try {
             durationAsDate = LocalDateTime.parse(Duration.getText(), FORMATTER);
         } catch (DateTimeParseException e) {
-            System.out.println("Invalid Duration Time Format");
+            System.out.println("Invalid Duration Time Format: " + Duration.getText());
             return;
         }
         long durationSeconds = Math.abs(durationAsDate.until(LocalDateTime.parse("2000-01-01 00:00:00", FORMATTER), ChronoUnit.SECONDS));
@@ -241,7 +252,58 @@ public class EditItem extends JFrame {
         long durationMinutes = startDate.until(endDate, ChronoUnit.MINUTES) - (durationHours * 60);
         long durationSeconds = startDate.until(endDate, ChronoUnit.SECONDS) - (durationMinutes * 60);
 
-        return durationYears + "-" + durationMonths + "-" + durationDays + " " + durationHours + ":" + durationMinutes + ":" + durationSeconds;
+        String durationString = "";
+        if (durationYears < 0) {
+            durationString += "0000-";
+        } else if (durationYears < 10) {
+            durationString += "000" + durationYears + "-";
+        } else if (durationYears < 100) {
+            durationString += "00" + durationYears + "-";
+        } else if (durationYears < 1000) {
+            durationString += "0" + durationYears + "-";
+        }
+
+        if (durationMonths < 0) {
+            durationString += "00-";
+        } else if (durationMonths < 10) {
+            durationString += "0" + durationMonths + "-";
+        } else {
+            durationString += durationMonths + "-";
+        }
+
+        if (durationDays < 0) {
+            durationString += "00 ";
+        } else if (durationDays < 10) {
+            durationString += "0" + durationDays + " ";
+        } else {
+            durationString += durationDays + " ";
+        }
+
+        if (durationHours < 0) {
+            durationString += "00:";
+        } else if (durationHours < 10) {
+            durationString += "0" + durationHours + ":";
+        } else {
+            durationString += durationHours + ":";
+        }
+
+        if (durationMinutes < 0) {
+            durationString += "00:";
+        } else if (durationMinutes < 10) {
+            durationString += "0" + durationMinutes + ":";
+        } else {
+            durationString += durationMinutes + ":";
+        }
+
+        if (durationSeconds < 0) {
+            durationString += "00:";
+        } else if (durationSeconds < 10) {
+            durationString += "0" + durationSeconds + ":";
+        } else {
+            durationString += durationSeconds;
+        }
+
+        return durationString;
     }
 
     public EditItem(String newTitle, Task newTask, boolean editing) {
