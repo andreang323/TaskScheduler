@@ -121,16 +121,8 @@ public class EditItem extends JFrame {
             }
         });
 
-//        lockButtonGroup = new ButtonGroup();
-//        lockButtonGroup.add(lockRadioButton);
-//        lockButtonGroup.add(lockRadioButton1);
-//        lockButtonGroup.add(lockRadioButton2);
-
         if (!editing) {
-            lockButtonGroup.clearSelection();
-
             Priority.setText(String.valueOf(1));
-
         }
 
     }
