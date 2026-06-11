@@ -1,5 +1,6 @@
 package Tasks;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,6 +36,16 @@ public class Schedule implements Comparable <Schedule>{
 
     public void setPriorityScore(float priorityScore) {
         this.priorityScore = priorityScore;
+    }
+
+    public List<SolvedTask> getSolvedTask(Task task){
+        List<SolvedTask> solutions = new ArrayList<>();
+        for (SolvedTask solvedTask : TaskList){
+            if (solvedTask.getOriginalTask() == task){
+                solutions.add(solvedTask);
+            }
+        }
+        return solutions;
     }
 
     @Override

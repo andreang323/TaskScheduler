@@ -132,7 +132,6 @@ public class ScheduleSolver {
             }
         }
 
-        // Set up optional tasks
         // Add dependencies
 
         // Generate all possible schedules if maxSolutions == 0

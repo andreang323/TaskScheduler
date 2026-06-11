@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class SchedulerWindow extends JFrame{
@@ -217,15 +218,7 @@ public class SchedulerWindow extends JFrame{
 
         scheduleTimeUpdateButton.addActionListener(e -> {
             try {
-                ScheduleSolver solver = new ScheduleSolver();
-
-                long start = parseDateTime(scheduleStart.getText());
-                long end = parseDateTime(scheduleEnd.getText());
-
-                schedules = solver.GenerateSchedules(tasks, start, end, maxSolutions);
-                currentScheduleIndex = 0;
-
-                refreshScheduleDisplay();
+                updateSchedule();
             }
             catch (Exception ex) {
                 JOptionPane.showMessageDialog(
@@ -286,7 +279,42 @@ public class SchedulerWindow extends JFrame{
         });
 
         lockButton.addActionListener(e-> {
-            System.out.println("not implemented yet, to do after display done");
+            if (schedules.size() <= 0){
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No available schedule.",
+                        "Cannot lock!",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+            Schedule currentSchedule = schedules.get(currentScheduleIndex);
+            List<SolvedTask> matchingTasks = currentSchedule.getSolvedTask(task);
+            if (matchingTasks.size() <= 0){
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No matching tasks found in schedule.",
+                        "Cannot lock!",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+            else if (matchingTasks.size() > 1){
+                JOptionPane.showMessageDialog(
+                        this,
+                        "More than one matching task found in schedule.",
+                        "Cannot lock!",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+            SolvedTask solvedTask = matchingTasks.getFirst();
+            Task newTask = task.copy();
+            newTask.setStartTime(solvedTask.getStartTime());
+            newTask.setEndTime(solvedTask.getEndTime());
+            Collections.replaceAll(tasks, task, newTask);
+            refreshTaskList();
+            updateSchedule();
         });
 
         deleteButton.addActionListener(e -> {
@@ -303,6 +331,18 @@ public class SchedulerWindow extends JFrame{
         panel.add(deleteButton);
         panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         return panel;
+    }
+
+    private void updateSchedule(){
+        ScheduleSolver solver = new ScheduleSolver();
+
+        long start = parseDateTime(scheduleStart.getText());
+        long end = parseDateTime(scheduleEnd.getText());
+
+        schedules = solver.GenerateSchedules(tasks, start, end, maxSolutions);
+        currentScheduleIndex = 0;
+
+        refreshScheduleDisplay();
     }
 
     private void refreshTaskList() {

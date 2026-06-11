@@ -55,6 +55,10 @@ public class SolvedTask implements Comparable <SolvedTask>{
         this.score = score;
     }
 
+    public Task getOriginalTask() {
+        return OriginalTask;
+    }
+
     @Override
     public int compareTo(SolvedTask otherTask){
         return Float.compare(getStartTime(), otherTask.getStartTime());

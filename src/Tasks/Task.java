@@ -104,4 +104,20 @@ public class Task {
     public void setDependencies(List<TaskDependency> dependencies) {
         this.dependencies = dependencies;
     }
+
+    public Task copy(){
+        Task newCopy =  new Task();
+
+        newCopy.Name = Name;
+        newCopy.StartTime = StartTime;
+        newCopy.EndTime = EndTime;
+        newCopy.Duration = Duration;
+        newCopy.LockStartTime = LockStartTime;
+        newCopy.LockEndTime= LockEndTime;
+        newCopy.optional = optional;
+        newCopy.priority = priority;
+        newCopy.dependencies= dependencies;
+        newCopy.taskID = taskID;
+        return newCopy;
+    }
 }
