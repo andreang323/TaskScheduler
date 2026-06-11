@@ -170,10 +170,19 @@ public class EditDependency extends JFrame {
             return;
         }
 
+        if (taskList.getSelectedIndex() == -1){
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Please select a task.",
+                    "No task selected.",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
         // it's just easier if it knows
         dependency.setTaskName(taskNames[taskList.getSelectedIndex()]);
 
-        // Set TaskID (this should never be -1 because we select 0 by default)
+        // Set TaskID
         dependency.setDependencyTaskID(taskIDMap.get(taskNames[taskList.getSelectedIndex()]));
 
         // Set correct type
