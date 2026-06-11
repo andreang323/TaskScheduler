@@ -130,7 +130,7 @@
       <component id="1ca8d" class="javax.swing.JList" binding="mustPrecede">
         <constraints>
           <grid row="5" column="4" row-span="1" col-span="1" vsize-policy="6" hsize-policy="2" anchor="0" fill="3" indent="0" use-parent-layout="false">
-            <preferred-size width="150" height="50"/>
+            <preferred-size width="150" height="55"/>
           </grid>
         </constraints>
         <properties>
@@ -141,7 +141,9 @@
       </component>
       <component id="c4f63" class="javax.swing.JLabel">
         <constraints>
-          <grid row="5" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="5" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="98" height="55"/>
+          </grid>
         </constraints>
         <properties>
           <text value="Must Precede"/>
@@ -149,7 +151,9 @@
       </component>
       <component id="30394" class="javax.swing.JLabel">
         <constraints>
-          <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="84" height="55"/>
+          </grid>
         </constraints>
         <properties>
           <text value="Must Follow"/>
@@ -158,7 +162,7 @@
       <component id="85760" class="javax.swing.JList" binding="mustFollow">
         <constraints>
           <grid row="5" column="2" row-span="1" col-span="1" vsize-policy="6" hsize-policy="2" anchor="0" fill="3" indent="0" use-parent-layout="false">
-            <preferred-size width="150" height="50"/>
+            <preferred-size width="150" height="55"/>
           </grid>
         </constraints>
         <properties>
@@ -167,7 +171,7 @@
           </model>
         </properties>
       </component>
-      <grid id="45300" layout-manager="GridLayoutManager" row-count="1" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="45300" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="7" column="1" row-span="1" col-span="4" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -175,17 +179,9 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="b72f" class="javax.swing.JButton" binding="validateButton" default-binding="true">
-            <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="Validate"/>
-            </properties>
-          </component>
           <component id="e519d" class="javax.swing.JButton" binding="createButton" default-binding="true">
             <constraints>
-              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="Create"/>
@@ -193,7 +189,7 @@
           </component>
           <component id="77930" class="javax.swing.JButton" binding="cancelButton" default-binding="true">
             <constraints>
-              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="Cancel"/>

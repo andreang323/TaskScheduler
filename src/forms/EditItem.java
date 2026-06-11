@@ -40,7 +40,6 @@ public class EditItem extends JFrame {
     private JList<String> mustPrecede;
     private JList<String> mustFollow;
     private JList<String> dependsOn;
-    private JButton validateButton;
     private JCheckBox Optional;
     private JLabel timeNote1;
     private JLabel timeNote2;
