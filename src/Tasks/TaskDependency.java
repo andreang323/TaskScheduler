@@ -1,7 +1,7 @@
 package Tasks;
 
 public class TaskDependency {
-    public enum DependencyType{
+    public enum DependencyType {
         IMMEDIATELY_AFTER,
         IMMEDIATELY_BEFORE,
         LOOSELY_BEFORE,
