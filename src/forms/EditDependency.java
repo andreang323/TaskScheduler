@@ -201,6 +201,16 @@ public class EditDependency extends JFrame {
                 break;
         }
 
+        if ((typeList.getSelectedIndex() == 0 || typeList.getSelectedIndex() == 1) && repeat > 1) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Cannot have more than one instance immediately before or immediately after",
+                    "Invalid Dependency.",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+
         // Notify the listener with the task object
         if (dependencySaveButtonListener != null) {
             dependencySaveButtonListener.onSubmitClicked(dependency);
