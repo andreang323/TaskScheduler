@@ -10,6 +10,7 @@ public class TaskDependency {
 
     private int DependencyTaskID;
     private DependencyType type;
+    private int RepeatCount = 1;
 
     public int getDependencyTaskID() {
         return DependencyTaskID;
@@ -25,5 +26,13 @@ public class TaskDependency {
 
     public void setType(DependencyType type) {
         this.type = type;
+    }
+
+    public int getRepeatCount() {
+        return RepeatCount;
+    }
+
+    public void setRepeatCount(int repeatCount) {
+        RepeatCount = repeatCount;
     }
 }

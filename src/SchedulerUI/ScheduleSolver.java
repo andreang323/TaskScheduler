@@ -2,24 +2,58 @@ package SchedulerUI;
 
 import Tasks.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+
 import com.microsoft.z3.*;
 
 public class ScheduleSolver {
 
     private static class SolvingTask{
         int taskIndex;
+        int taskID;
         BoolExpr active;
         IntExpr taskStart;
         IntExpr taskEnd;
+        List<List<ArithExpr>> dependencyListTerms;
+        Expr taskConstraints;
 
-        public SolvingTask(int taskIndex, BoolExpr active, IntExpr taskStart, IntExpr taskEnd) {
+        public SolvingTask(int taskIndex, Task task, Context ctx, long scheduleStart, long scheduleEnd) {
             this.taskIndex = taskIndex;
-            this.active = active;
-            this.taskStart = taskStart;
-            this.taskEnd = taskEnd;
+            this.taskID = task.getTaskID();
+            this.active = ctx.mkBoolConst("active" + taskIndex);
+            this.taskStart = ctx.mkIntConst("taskStart" + taskIndex);
+            this.taskEnd = ctx.mkIntConst("taskEnd" + taskIndex);
+            this.dependencyListTerms = new ArrayList<>();
+
+            taskConstraints = ctx.mkTrue();
+
+            // start time >= scheduleStart
+            taskConstraints = ctx.mkAnd(taskConstraints, ctx.mkGe(taskStart, ctx.mkInt(scheduleStart)));
+            // end time <= scheduleEnd
+            taskConstraints = ctx.mkAnd(taskConstraints, ctx.mkLe(taskEnd, ctx.mkInt(scheduleEnd)));
+            // start time >= taskStart
+            taskConstraints = ctx.mkAnd(taskConstraints, ctx.mkGe(taskStart, ctx.mkInt(task.getStartTime())));
+
+            // end time <= taskEnd
+            taskConstraints = ctx.mkAnd(taskConstraints, ctx.mkLe(taskEnd, ctx.mkInt(task.getEndTime())));
+            // end time > start time
+            taskConstraints = ctx.mkAnd(taskConstraints, ctx.mkGt(taskEnd, taskStart));
+            // end time - start time = duration
+            taskConstraints = ctx.mkAnd(taskConstraints, ctx.mkEq(ctx.mkSub(taskEnd, taskStart), ctx.mkInt(task.getDuration())));
+
+            if (!task.isOptional()){
+                taskConstraints = ctx.mkAnd(taskConstraints, ctx.mkEq(active, ctx.mkTrue()));
+            }
+            else {
+                // Set inactive task defaults
+                BoolExpr InactiveTaskConstraints = ctx.mkAnd(ctx.mkEq(active, ctx.mkFalse()));
+                InactiveTaskConstraints = ctx.mkAnd(InactiveTaskConstraints, ctx.mkEq(taskStart, ctx.mkInt(0)));
+                InactiveTaskConstraints = ctx.mkAnd(InactiveTaskConstraints, ctx.mkEq(taskEnd, ctx.mkInt(0)));
+
+                // If active: fulfill active task constraints, otherwise set inactive defaults
+                Expr ifActive = ctx.mkITE(ctx.mkEq(active, ctx.mkTrue()), taskConstraints, InactiveTaskConstraints);
+                taskConstraints =  ifActive;
+            }
         }
     }
 
@@ -38,101 +72,183 @@ public class ScheduleSolver {
         List<Schedule> schedules = new ArrayList<>();
         Context ctx = new Context();
         Solver s = ctx.mkSolver();
-        List<SolvingTask> variableList = new ArrayList<>();
+        List<SolvingTask> solvingTaskList = new ArrayList<>();
+        // Track all invalid task IDs, since any tasks dependent on an invalid task becomes invalid
+        List<Integer> invalidTaskIDs = new ArrayList<>();
 
         // Set up base case (singular task) requirements
         int i = 0;
+        // Set up lookup table for tasks
+        Map<Integer, Task> taskMap = new HashMap<>();
         for (Task task : tasks){
-            // create new intermediate SolvingTask for current task
-            SolvingTask currentTask = new SolvingTask(i, ctx.mkBoolConst("active" + i), ctx.mkIntConst("taskStart" + i), ctx.mkIntConst("taskEnd" + i));
+            taskMap.put(task.getTaskID(), task);
 
-            BoolExpr taskConstraints = ctx.mkTrue();
-
-            // start time >= scheduleStart
-            taskConstraints = ctx.mkAnd(taskConstraints, ctx.mkGe(currentTask.taskStart, ctx.mkInt(scheduleStart)));
-            // end time <= scheduleEnd
-            taskConstraints = ctx.mkAnd(taskConstraints, ctx.mkLe(currentTask.taskEnd, ctx.mkInt(scheduleEnd)));
-            // start time >= taskStart
-            taskConstraints = ctx.mkAnd(taskConstraints, ctx.mkGe(currentTask.taskStart, ctx.mkInt(task.getStartTime())));
-
+            // Validate task:
             // Check if invalid start time
             if (scheduleEnd <= task.getStartTime()){
-                System.out.println("Task start time " + task.getStartTime() + " exceeds schedule end time   " + scheduleEnd + ", skipping task");
+                System.out.println("Task start time " + task.getStartTime() + " exceeds schedule end time   " + scheduleEnd + ", skipping task " + task.getTaskID());
+                invalidTaskIDs.add(task.getTaskID());
                 i ++;
                 continue;
             }
             // Check if invalid end time
             if (task.getEndTime() < scheduleStart){
-                System.out.println("Task end time " + task.getEndTime() + " before schedule start time " + scheduleStart + ", skipping task");
+                System.out.println("Task end time " + task.getEndTime() + " before schedule start time " + scheduleStart + ", skipping task " + task.getTaskID());
+                invalidTaskIDs.add(task.getTaskID());
                 i ++;
                 continue;
             }
             // Check if invalid duration
             if (task.getDuration() <= 0){
-                System.out.println("Duration cannot be 0, skipping task");
+                System.out.println("Duration cannot be 0, skipping task " + task.getTaskID());
+                invalidTaskIDs.add(task.getTaskID());
                 i ++;
                 continue;
             }
 
-            // end time <= taskEnd
-            taskConstraints = ctx.mkAnd(taskConstraints, ctx.mkLe(currentTask.taskEnd, ctx.mkInt(task.getEndTime())));
-            // end time > start time
-            taskConstraints = ctx.mkAnd(taskConstraints, ctx.mkGt(currentTask.taskEnd, currentTask.taskStart));
-            // end time - start time = duration
-            taskConstraints = ctx.mkAnd(taskConstraints, ctx.mkEq(ctx.mkSub(currentTask.taskEnd, currentTask.taskStart), ctx.mkInt(task.getDuration())));
-
-            if (!task.isOptional()){
-                taskConstraints = ctx.mkAnd(taskConstraints, ctx.mkEq(currentTask.active, ctx.mkTrue()));
-                s.add(taskConstraints);
-            }
-            else {
-                // Set inactive task defaults
-                BoolExpr InactiveTaskConstraints = ctx.mkAnd(ctx.mkEq(currentTask.active, ctx.mkFalse()));
-                InactiveTaskConstraints = ctx.mkAnd(InactiveTaskConstraints, ctx.mkEq(currentTask.taskStart, ctx.mkInt(0)));
-                InactiveTaskConstraints = ctx.mkAnd(InactiveTaskConstraints, ctx.mkEq(currentTask.taskEnd, ctx.mkInt(0)));
-
-                // If active: fulfill active task constraints, otherwise set inactive defaults
-                Expr ifActive = ctx.mkITE(ctx.mkEq(currentTask.active, ctx.mkTrue()), taskConstraints, InactiveTaskConstraints);
-                s.add(ifActive);
-            }
-
+            // create new intermediate SolvingTask for current task
+            SolvingTask currentTask = new SolvingTask(i, task, ctx, scheduleStart, scheduleEnd);
             // move onto next task
-            variableList.add(currentTask);
+            solvingTaskList.add(currentTask);
             i ++;
         }
 
         // check if all tasks were invalid
-        if (variableList.isEmpty()){
+        if (solvingTaskList.isEmpty()){
             System.out.println("All tasks were invalid. No schedule could be created.");
             return List.of();
         }
 
+        // Add dependencies for each task
+        int n = 0;
+        while (n < solvingTaskList.size()){
+            SolvingTask solvingTask = solvingTaskList.get(n);
+            Task baseTask = tasks.get(solvingTask.taskIndex);
+            List<TaskDependency> dependencies = baseTask.getDependencies();
+            // No dependencies? go on
+            if (dependencies.isEmpty()){
+                n ++;
+                continue;
+            }
+            // For each dependency:
+            for (int p = 0; p < dependencies.size(); p++){
+                // current dependency
+                TaskDependency dependency = dependencies.get(p);
+                int repeats = dependency.getRepeatCount();
+                // Invalid dependencies can cause a cascading effect and
+                // I honestly have no interest in propagating invalidation
+                // up the tree so we will kill it here
+                if (invalidTaskIDs.contains(dependency.getDependencyTaskID())){
+                    System.out.println("Dependency on invalid task found: aborting.");
+                    return List.of();
+                }
+
+                int matchID = dependency.getDependencyTaskID();
+
+                // Abort if self-referential dependency found
+                if (solvingTask.taskID == matchID){
+                    System.out.println("Self-referential dependency found: aborting.");
+                    return List.of();
+                }
+
+                // Create a list of tasks with the correct taskID at least repeats long
+                int seenMatches = 0;
+                List<SolvingTask> matchingTasks = new ArrayList<>();
+                // Check all solving tasks for matching taskID
+                for (SolvingTask matchingTask : solvingTaskList){
+                    if (matchingTask.taskID == matchID){
+                        matchingTasks.add(matchingTask);
+                    }
+                }
+                // out of solving tasks with matching taskID and we still need repeats:
+                if (matchingTasks.size() < repeats){
+                    while (matchingTasks.size() < repeats){
+                        // add another solving task with the correct taskID
+                        SolvingTask newTask = new SolvingTask(i, taskMap.get(matchID), ctx, scheduleStart, scheduleEnd);
+                        solvingTaskList.add(newTask);
+                        matchingTasks.add(newTask);
+
+                    }
+                }
+
+                // for each matching task:
+                ArithExpr[] terms = new ArithExpr[matchingTasks.size()];
+                Expr dependenciesSatisfied = ctx.mkTrue();
+                for (int m = 0; m < matchingTasks.size(); m++){
+                    // add a term
+                    SolvingTask matchingTask = matchingTasks.get(m);
+                    terms[m] = (ctx.mkIntConst("dp_" + p + "_" + m));
+
+                    // both tasks must be active
+                    BoolExpr activeAndSatisfies = ctx.mkAnd(ctx.mkEq(matchingTask.active, ctx.mkTrue()), ctx.mkEq(solvingTask.active, ctx.mkTrue()));
+                    BoolExpr then = ctx.mkEq(terms[m], ctx.mkInt(1));
+                    BoolExpr elseStatement = ctx.mkEq(terms[m], ctx.mkInt(0));
+
+                    // if dependency satisfied: corresponding term == 1
+                    switch (dependency.getType()){
+                        case LOOSELY_AFTER:
+                            // START TIME OF DEPENDENT >= END TIME OF DEPENDENCY
+                            activeAndSatisfies = ctx.mkAnd(ctx.mkGe(solvingTask.taskStart, matchingTask.taskEnd));
+                            break;
+
+                        case IMMEDIATELY_AFTER:
+                            // START TIME OF DEPENDENT == END TIME OF DEPENDENCY
+                            activeAndSatisfies = ctx.mkAnd(ctx.mkEq(solvingTask.taskStart, matchingTask.taskEnd));
+                            break;
+
+                        case LOOSELY_BEFORE:
+                            // END TIME OF DEPENDENT =< START TIME OF DEPENDENCY
+                            activeAndSatisfies = ctx.mkAnd(ctx.mkLe(solvingTask.taskEnd, matchingTask.taskStart));
+                            break;
+
+                        case IMMEDIATELY_BEFORE:
+                            // END TIME OF DEPENDENT == START TIME OF DEPENDENCY
+                            activeAndSatisfies = ctx.mkAnd(ctx.mkEq(solvingTask.taskEnd, matchingTask.taskStart));
+                            break;
+                    }
+                    Expr ifActive = ctx.mkITE(activeAndSatisfies, then, elseStatement);
+                    solvingTaskList.get(n).taskConstraints = ctx.mkAnd(solvingTask.taskConstraints, ifActive);
+                }
+                solvingTask.dependencyListTerms.add(List.of(terms));
+                // The sum of tasks that satisfy the dependency should be >= to the repeat count
+                BoolExpr isActive = ctx.mkEq(solvingTask.active, ctx.mkTrue());
+                BoolExpr repeatsMet = ctx.mkGe(ctx.mkAdd(terms), ctx.mkInt(repeats));
+                Expr ifActive = ctx.mkITE(isActive, repeatsMet, ctx.mkTrue());
+                solvingTaskList.get(n).taskConstraints = ctx.mkAnd(solvingTask.taskConstraints, ifActive);
+            }
+            n ++;
+        }
+
         // Prevent tasks from overlapping
         // iterate through each list of task variables
-        for (int j = 0; j < variableList.size(); j++) {
+        for (int j = 0; j < solvingTaskList.size(); j++) {
             // check them against all the other lists of task variables
-            for (int k = 0; k < variableList.size(); k++) {
+            for (int k = 0; k < solvingTaskList.size(); k++) {
 //                System.out.println(j + " vs " + k);
                 // Only set constraints if not against self
                 if (j != k){
-                    IntExpr startA = variableList.get(j).taskStart;
-                    IntExpr endA = variableList.get(j).taskEnd;
-                    IntExpr startB = variableList.get(k).taskStart;
-                    IntExpr endB = variableList.get(k).taskEnd;
+                    IntExpr startA = solvingTaskList.get(j).taskStart;
+                    IntExpr endA = solvingTaskList.get(j).taskEnd;
+                    IntExpr startB = solvingTaskList.get(k).taskStart;
+                    IntExpr endB = solvingTaskList.get(k).taskEnd;
                     // startA < startB and endA <= startB
                     BoolExpr ABeforeB = ctx.mkAnd(ctx.mkLt(startA, startB), ctx.mkLe(endA, startB));
                     // startB < startA and endB <= startA
                     BoolExpr BBeforeA = ctx.mkAnd(ctx.mkLt(startB, startA), ctx.mkLe(endB, startA));
                     // Hence task A must be before task B or task B must be before task A if both are active
                     BoolExpr ABeforeOrBBefore = ctx.mkOr(ABeforeB, BBeforeA);
-                    BoolExpr bothActive = ctx.mkAnd(ctx.mkEq(variableList.get(j).active, ctx.mkTrue()), ctx.mkEq(variableList.get(k).active, ctx.mkTrue()));
+                    BoolExpr bothActive = ctx.mkAnd(ctx.mkEq(solvingTaskList.get(j).active, ctx.mkTrue()), ctx.mkEq(solvingTaskList.get(k).active, ctx.mkTrue()));
                     Expr ifActive = ctx.mkITE(bothActive, ABeforeOrBBefore, ctx.mkTrue());
-                    s.add(ifActive);
+                    // Add to taskA's constraints
+                    solvingTaskList.get(j).taskConstraints = ctx.mkAnd(solvingTaskList.get(j).taskConstraints, ifActive);
                 }
             }
         }
 
-        // Add dependencies
+        // Add all task constraints
+        for (SolvingTask solvingTask : solvingTaskList){
+            s.add(solvingTask.taskConstraints);
+        }
 
         // Generate all possible schedules if maxSolutions == 0
         // else generate only maxSolutions amount of solutions
@@ -142,9 +258,9 @@ public class ScheduleSolver {
                 Model m = s.getModel();
                 BoolExpr solution_c = ctx.mkTrue();
                 List<SolvedTask> solvedTaskList = new ArrayList<>();
-                for (int j = 0; j < variableList.size(); j++) {
+                for (int j = 0; j < solvingTaskList.size(); j++) {
                     // get solution for this task
-                    SolvingTask currentSolving = variableList.get(j);
+                    SolvingTask currentSolving = solvingTaskList.get(j);
                     Expr active = m.evaluate(currentSolving.active, true);
                     boolean isActive = active.isTrue();
 //                    System.out.println("Is active: "+ isActive);
@@ -156,7 +272,7 @@ public class ScheduleSolver {
                     // Only add this task as solved if it's active
                     if (isActive){
                         // init new solved task
-                        SolvedTask newSolvedTask = new SolvedTask(tasks.get(j), tStartInt, tEndInt);
+                        SolvedTask newSolvedTask = new SolvedTask(tasks.get(currentSolving.taskIndex), tStartInt, tEndInt);
                         // System.out.println("active: " + isActive + " start time: " + tStartInt + " end time: " +  tEndInt);
 
                         // add new solved task

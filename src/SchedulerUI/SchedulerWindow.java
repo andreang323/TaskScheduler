@@ -227,6 +227,7 @@ public class SchedulerWindow extends JFrame {
                         "Invalid Date",
                         JOptionPane.ERROR_MESSAGE
                 );
+                System.out.println("you've met a terrible fate haven't you");
             }
         });
 
