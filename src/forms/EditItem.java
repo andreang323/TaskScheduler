@@ -42,9 +42,9 @@ public class EditItem extends JFrame {
     private JCheckBox Optional;
     private JLabel timeNote1;
     private JEditorPane description;
-    private JButton addDependancyButton;
-    private JScrollPane dependancyScrollPane;
-    private JLabel dependanciesSectionLabel;
+    private JButton addDependencyButton;
+    private JScrollPane dependencyScrollPane;
+    private JLabel dependenciesSectionLabel;
     private TimeLockListener timeLockListener;
     private SaveButtonListener saveButtonListener;
     private Task task;
