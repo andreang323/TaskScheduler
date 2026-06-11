@@ -127,7 +127,10 @@ public class EditItem extends JFrame {
 //        lockButtonGroup.add(lockRadioButton2);
 
         if (!editing) {
-//            lockButtonGroup.clearSelection();
+            lockButtonGroup.clearSelection();
+
+            Priority.setText(String.valueOf(1));
+
         }
 
     }
