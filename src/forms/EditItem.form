@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="contentPane" layout-manager="GridLayoutManager" row-count="9" column-count="6" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="1480" height="507"/>
+      <xy x="20" y="20" width="1479" height="467"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -201,7 +201,7 @@
           </component>
         </children>
       </grid>
-      <grid id="b85f7" layout-manager="GridLayoutManager" row-count="5" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="b85f7" layout-manager="GridLayoutManager" row-count="5" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="1" column="3" row-span="2" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -225,15 +225,6 @@
             </constraints>
             <properties>
               <text value=""/>
-            </properties>
-          </component>
-          <component id="8b23" class="javax.swing.JRadioButton" binding="lockRadioButton" default-binding="true">
-            <constraints>
-              <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <selected value="true"/>
-              <text value="Lock"/>
             </properties>
           </component>
           <component id="ffc8b" class="javax.swing.JLabel">
@@ -270,25 +261,9 @@
               <text value=""/>
             </properties>
           </component>
-          <component id="3d8fa" class="javax.swing.JRadioButton" binding="lockRadioButton1" default-binding="true">
-            <constraints>
-              <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="Lock"/>
-            </properties>
-          </component>
-          <component id="f4380" class="javax.swing.JRadioButton" binding="lockRadioButton2" default-binding="true">
-            <constraints>
-              <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="Lock"/>
-            </properties>
-          </component>
           <component id="7dcef" class="javax.swing.JLabel" binding="timeNote1">
             <constraints>
-              <grid row="0" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="Enter ISO8601 timestamps (YYYY-MM-DDThh:mm:ss)."/>
@@ -296,7 +271,7 @@
           </component>
           <component id="3f075" class="javax.swing.JLabel" binding="timeNote2">
             <constraints>
-              <grid row="1" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="Timestamps will be recalculated on field updates unless locked."/>

@@ -28,10 +28,10 @@ public class EditItem extends JFrame {
     private JTextField EndTime;
     private JTextField Duration;
 
-    private ButtonGroup lockButtonGroup;
-    private JRadioButton lockRadioButton;
-    private JRadioButton lockRadioButton1;
-    private JRadioButton lockRadioButton2;
+//    private ButtonGroup lockButtonGroup;
+//    private JRadioButton lockRadioButton;
+//    private JRadioButton lockRadioButton1;
+//    private JRadioButton lockRadioButton2;
 
     private JTextField Priority;
     private JList<String> isDependedOn;
@@ -75,8 +75,8 @@ public class EditItem extends JFrame {
 
             Duration.setText(String.valueOf(task.getDuration()));
             description.setText(task.getDescription());
-            lockRadioButton.setSelected(task.isLockStartTime());
-            lockRadioButton2.setSelected(task.isLockEndTime());
+//            lockRadioButton.setSelected(task.isLockStartTime());
+//            lockRadioButton2.setSelected(task.isLockEndTime());
             Priority.setText(String.valueOf(task.getPriority()));
             Optional.setSelected(task.isOptional());
         }
@@ -122,13 +122,13 @@ public class EditItem extends JFrame {
             }
         });
 
-        lockButtonGroup = new ButtonGroup();
-        lockButtonGroup.add(lockRadioButton);
-        lockButtonGroup.add(lockRadioButton1);
-        lockButtonGroup.add(lockRadioButton2);
+//        lockButtonGroup = new ButtonGroup();
+//        lockButtonGroup.add(lockRadioButton);
+//        lockButtonGroup.add(lockRadioButton1);
+//        lockButtonGroup.add(lockRadioButton2);
 
         if (!editing) {
-            lockButtonGroup.clearSelection();
+//            lockButtonGroup.clearSelection();
         }
 
     }
@@ -152,21 +152,21 @@ public class EditItem extends JFrame {
             endDate = LocalDateTime.parse(EndTime.getText(), DATE_FORMAT);
         }
 
-        if (lockRadioButton.isSelected()) {
-            // StartTime locked, treat duration as driven
-            Duration.setText(getDurationString(startDate, endDate));
-        } else if (lockRadioButton1.isSelected()) {
-            // endtime locked, treat duration as driven
-            Duration.setText(getDurationString(startDate, endDate));
-        } else if (lockRadioButton2.isSelected()) {
-            // duration locked, treat end time as driven
-            if (!Duration.getText().isEmpty()) {
-                long durationMinutes = Long.parseLong(Duration.getText());
-                LocalDateTime endTime = startDate.plusMinutes(durationMinutes);
-                EndTime.setText(endTime.format(DATE_FORMAT));
-            }
-
-        }
+//        if (lockRadioButton.isSelected()) {
+//            // StartTime locked, treat duration as driven
+//            Duration.setText(getDurationString(startDate, endDate));
+//        } else if (lockRadioButton1.isSelected()) {
+//            // endtime locked, treat duration as driven
+//            Duration.setText(getDurationString(startDate, endDate));
+//        } else if (lockRadioButton2.isSelected()) {
+//            // duration locked, treat end time as driven
+//            if (!Duration.getText().isEmpty()) {
+//                long durationMinutes = Long.parseLong(Duration.getText());
+//                LocalDateTime endTime = startDate.plusMinutes(durationMinutes);
+//                EndTime.setText(endTime.format(DATE_FORMAT));
+//            }
+//
+//        }
     }
 
     public void handleEndTimeChange() {
@@ -190,19 +190,19 @@ public class EditItem extends JFrame {
             startDate = LocalDateTime.parse(StartTime.getText(), DATE_FORMAT);
         }
 
-        if (lockRadioButton.isSelected()) {
-            // StartTime locked, treat duration as driven
-            Duration.setText(getDurationString(startDate, endDate));
-        } else if (lockRadioButton1.isSelected()) {
-            // endtime locked, treat duration as driven
-            Duration.setText(getDurationString(startDate, endDate));
-        } else if (lockRadioButton2.isSelected()) {
-            if (!Duration.getText().isEmpty()) {
-                long durationMinutes = Long.parseLong(Duration.getText());
-                LocalDateTime startTime = endDate.minusMinutes(durationMinutes);
-                StartTime.setText(startTime.format(DATE_FORMAT));
-            }
-        }
+//        if (lockRadioButton.isSelected()) {
+//            // StartTime locked, treat duration as driven
+//            Duration.setText(getDurationString(startDate, endDate));
+//        } else if (lockRadioButton1.isSelected()) {
+//            // endtime locked, treat duration as driven
+//            Duration.setText(getDurationString(startDate, endDate));
+//        } else if (lockRadioButton2.isSelected()) {
+//            if (!Duration.getText().isEmpty()) {
+//                long durationMinutes = Long.parseLong(Duration.getText());
+//                LocalDateTime startTime = endDate.minusMinutes(durationMinutes);
+//                StartTime.setText(startTime.format(DATE_FORMAT));
+//            }
+//        }
     }
 
     public void handleDurationChange() {
@@ -238,25 +238,25 @@ public class EditItem extends JFrame {
         }
 
 
-        if (lockRadioButton.isSelected()) {
-            // StartTime locked, treat endTime as driven
-            if (startDate != null) {
-                LocalDateTime endTime = startDate.plusMinutes(durationMinutes);
-                EndTime.setText(endTime.format(DATE_FORMAT));
-            }
-        } else if (lockRadioButton1.isSelected()) {
-            // endtime locked, treat startTime as driven
-            if (endDate != null) {
-                LocalDateTime startTime = endDate.minusMinutes(durationMinutes);
-                StartTime.setText(startTime.format(DATE_FORMAT));
-            }
-        } else if (lockRadioButton2.isSelected()) {
-            // duration is locked, treat endTime as driven
-            if (startDate != null) {
-                LocalDateTime startTime = startDate.plusMinutes(durationMinutes);
-                EndTime.setText(startTime.format(DATE_FORMAT));
-            }
-        }
+//        if (lockRadioButton.isSelected()) {
+//            // StartTime locked, treat endTime as driven
+//            if (startDate != null) {
+//                LocalDateTime endTime = startDate.plusMinutes(durationMinutes);
+//                EndTime.setText(endTime.format(DATE_FORMAT));
+//            }
+//        } else if (lockRadioButton1.isSelected()) {
+//            // endtime locked, treat startTime as driven
+//            if (endDate != null) {
+//                LocalDateTime startTime = endDate.minusMinutes(durationMinutes);
+//                StartTime.setText(startTime.format(DATE_FORMAT));
+//            }
+//        } else if (lockRadioButton2.isSelected()) {
+//            // duration is locked, treat endTime as driven
+//            if (startDate != null) {
+//                LocalDateTime startTime = startDate.plusMinutes(durationMinutes);
+//                EndTime.setText(startTime.format(DATE_FORMAT));
+//            }
+//        }
     }
 
     private static String getDurationString(LocalDateTime startDate, LocalDateTime endDate) {
@@ -392,8 +392,8 @@ public class EditItem extends JFrame {
         );
 
         task.setDuration(Long.parseLong(Duration.getText()));
-        task.setLockStartTime(lockRadioButton.isSelected());
-        task.setLockEndTime(lockRadioButton2.isSelected());
+//        task.setLockStartTime(lockRadioButton.isSelected());
+//        task.setLockEndTime(lockRadioButton2.isSelected());
         task.setPriority(Integer.parseInt(Priority.getText()));
         task.setOptional(Optional.isSelected());
         task.setDescription(description.getText());
