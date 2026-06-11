@@ -6,16 +6,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 import static Tasks.TaskDependency.DependencyType.*;
 
 public class EditDependency extends JFrame {
     private String[] taskNames;
-    private Map<String, Integer> taskIDMap;
+    private Map<String, Integer> taskIDMap = new HashMap<>();
     private final String[] dependencyTypes = {
             "Immediately before",
             "Immediately after",
@@ -42,10 +40,10 @@ public class EditDependency extends JFrame {
         int i = 0;
         for (Task task : tasks){
             // Skip self
-            if (!Objects.equals(ownerName, task.getName())) {
-                taskNamesList.add(task.getName());
+            if (Objects.equals(ownerName, task.getName())) {
                 continue;
             }
+            taskNamesList.add(task.getName());
             taskIDMap.put(task.getName(), task.getTaskID());
             // Record the current index in taskNamesList so we can set it in JList later
             if (task.getTaskID() == dependency.getDependencyTaskID()){
@@ -56,6 +54,8 @@ public class EditDependency extends JFrame {
         taskNames = taskNamesList.toArray(new String[0]);
         this.dependency = dependency;
         this.title = title;
+
+        setupPanel();
     }
 
     // Displays JFrame.
@@ -83,7 +83,7 @@ public class EditDependency extends JFrame {
         typeLabel = new JLabel("Type: ");
         typeList = new JList<>(dependencyTypes);
         timesLabel = new JLabel("Times: ");
-        timesField = new JTextField(dependency.getRepeatCount());
+        timesField = new JTextField(String.valueOf(dependency.getRepeatCount()));
 
         JButton saveButton = new JButton("Save");
         JButton cancelButton = new JButton("Cancel");
@@ -190,5 +190,9 @@ public class EditDependency extends JFrame {
             dependencySaveButtonListener.onSubmitClicked(dependency);
         }
         dispose();
+    }
+
+    public void setDependencySaveButtonListener(DependencySaveButtonListener listener) {
+        this.dependencySaveButtonListener = listener;
     }
 }

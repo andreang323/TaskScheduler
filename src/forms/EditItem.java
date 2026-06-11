@@ -122,6 +122,45 @@ public class EditItem extends JFrame {
             }
         });
 
+        addDependencyButton.addActionListener(e -> {
+            TaskDependency newDependency = new TaskDependency();
+            newDependency.setType(TaskDependency.DependencyType.IMMEDIATELY_AFTER);
+            newDependency.setRepeatCount(1);
+
+            EditDependency editDependency =
+                    new EditDependency(
+                            tasks,
+                            newDependency,
+                            "New Dependency",
+                            task.getName()
+                    );
+
+            editDependency.setDependencySaveButtonListener(dependency -> {
+                if (task.getDependencies() == null) {
+                    task.setDependencies(new ArrayList<>());
+                }
+
+                for (TaskDependency existing : task.getDependencies()) {
+                    if (existing.getDependencyTaskID() == dependency.getDependencyTaskID()
+                            && existing.getType() == dependency.getType()) {
+
+                        JOptionPane.showMessageDialog(
+                                this,
+                                "This dependency already exists.",
+                                "Duplicate Dependency",
+                                JOptionPane.ERROR_MESSAGE
+                        );
+                        return;
+                    }
+                }
+
+                task.getDependencies().add(dependency);
+
+                System.out.println("Added dependency: " + dependency);
+                refreshDependencyDisplay();
+            });
+        });
+
         if (!editing) {
             Priority.setText(String.valueOf(1));
         }
@@ -162,6 +201,19 @@ public class EditItem extends JFrame {
 //            }
 //
 //        }
+    }
+
+    private void refreshDependencyDisplay() {
+        dependencyScrollPane.removeAll();
+
+//        for (TaskDependency dependency : task.getDependencies()) {
+//            dependencyScrollPane.add(
+//                    createDependencyPanel(dependency)
+//            );
+//        }
+
+        dependencyScrollPane.revalidate();
+        dependencyScrollPane.repaint();
     }
 
     public void handleEndTimeChange() {
