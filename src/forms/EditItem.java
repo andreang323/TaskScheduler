@@ -78,7 +78,7 @@ public class EditItem extends JFrame {
             // EndTime.setText(LocalDateTime.ofInstant(Instant.ofEpochSecond(task.getEndTime()), java.time.ZoneId.systemDefault()).format(FORMATTER));
             // StartTime.setText(LocalDateTime.ofInstant(Instant.ofEpochSecond(task.getStartTime()), ZoneId.systemDefault()).format(FORMATTER));
             // EndTime.setText(LocalDateTime.ofInstant(Instant.ofEpochSecond(task.getEndTime()), ZoneId.systemDefault()).format(FORMATTER));
-            Duration.setText(String.valueOf(task.getDuration() / 60));
+            Duration.setText(String.valueOf(task.getDuration()));
             lockRadioButton.setSelected(task.isLockStartTime());
             lockRadioButton2.setSelected(task.isLockEndTime());
             Priority.setText(String.valueOf(task.getPriority()));
@@ -191,7 +191,7 @@ public class EditItem extends JFrame {
             // duration is locked, treat start time as driven
             long durationSeconds = startDate.until(endDate, ChronoUnit.SECONDS);
             LocalDateTime startTime = endDate.plusSeconds(durationSeconds);
-            EndTime.setText(startTime.format(DATE_FORMAT));
+            StartTime.setText(startTime.format(DATE_FORMAT));
         }
     }
 
@@ -438,7 +438,7 @@ public class EditItem extends JFrame {
         );
         // task.setStartTime(Instant.parse(StartTime.getText()).getEpochSecond()); // FIXME! Form validation does not expect timezone Z but required here
         // task.setEndTime(Instant.parse(EndTime.getText()).getEpochSecond());
-        task.setDuration(Long.parseLong(Duration.getText()) * 60);
+        task.setDuration(Long.parseLong(Duration.getText()));
         task.setLockStartTime(lockRadioButton.isSelected());
         task.setLockEndTime(lockRadioButton2.isSelected());
         task.setPriority(Integer.parseInt(Priority.getText()));
