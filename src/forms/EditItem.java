@@ -8,16 +8,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.Instant;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
-import java.time.ZoneId;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +26,12 @@ public class EditItem extends JFrame {
     private JTextField StartTime;
     private JTextField EndTime;
     private JTextField Duration;
+
+    private ButtonGroup lockButtonGroup;
     private JRadioButton lockRadioButton;
     private JRadioButton lockRadioButton1;
     private JRadioButton lockRadioButton2;
+
     private JTextField Priority;
     private JList<String> isDependedOn;
     private JList<String> mustImmediatelyFollow;
@@ -62,22 +59,19 @@ public class EditItem extends JFrame {
         if (task != null) {
             Name.setText(task.getName());
             StartTime.setText(
-                    Instant.ofEpochSecond(task.getStartTime())
+                    Instant.ofEpochSecond(task.getStartTime() * 60)
                             .atZone(ZoneId.systemDefault())
                             .toLocalDateTime()
                             .format(DATE_FORMAT)
             );
 
             EndTime.setText(
-                    Instant.ofEpochSecond(task.getEndTime())
+                    Instant.ofEpochSecond(task.getEndTime() * 60)
                             .atZone(ZoneId.systemDefault())
                             .toLocalDateTime()
                             .format(DATE_FORMAT)
             );
-            // StartTime.setText(LocalDateTime.ofInstant(Instant.ofEpochSecond(task.getStartTime()), java.time.ZoneId.systemDefault()).format(FORMATTER));
-            // EndTime.setText(LocalDateTime.ofInstant(Instant.ofEpochSecond(task.getEndTime()), java.time.ZoneId.systemDefault()).format(FORMATTER));
-            // StartTime.setText(LocalDateTime.ofInstant(Instant.ofEpochSecond(task.getStartTime()), ZoneId.systemDefault()).format(FORMATTER));
-            // EndTime.setText(LocalDateTime.ofInstant(Instant.ofEpochSecond(task.getEndTime()), ZoneId.systemDefault()).format(FORMATTER));
+
             Duration.setText(String.valueOf(task.getDuration()));
             lockRadioButton.setSelected(task.isLockStartTime());
             lockRadioButton2.setSelected(task.isLockEndTime());
@@ -125,6 +119,16 @@ public class EditItem extends JFrame {
                 handleDurationChange();
             }
         });
+
+        lockButtonGroup = new ButtonGroup();
+        lockButtonGroup.add(lockRadioButton);
+        lockButtonGroup.add(lockRadioButton1);
+        lockButtonGroup.add(lockRadioButton2);
+
+        if (!editing) {
+            lockButtonGroup.clearSelection();
+        }
+
     }
 
     public void handleStartTimeChange() {
@@ -154,9 +158,12 @@ public class EditItem extends JFrame {
             Duration.setText(getDurationString(startDate, endDate));
         } else if (lockRadioButton2.isSelected()) {
             // duration locked, treat end time as driven
-            long durationSeconds = startDate.until(endDate, ChronoUnit.SECONDS);
-            LocalDateTime endTime = startDate.minusSeconds(durationSeconds);
-            EndTime.setText(endTime.format(DATE_FORMAT));
+            if (!Duration.getText().isEmpty()) {
+                long durationMinutes = Long.parseLong(Duration.getText());
+                LocalDateTime endTime = startDate.plusMinutes(durationMinutes);
+                EndTime.setText(endTime.format(DATE_FORMAT));
+            }
+
         }
     }
 
@@ -188,10 +195,11 @@ public class EditItem extends JFrame {
             // endtime locked, treat duration as driven
             Duration.setText(getDurationString(startDate, endDate));
         } else if (lockRadioButton2.isSelected()) {
-            // duration is locked, treat start time as driven
-            long durationSeconds = startDate.until(endDate, ChronoUnit.SECONDS);
-            LocalDateTime startTime = endDate.plusSeconds(durationSeconds);
-            StartTime.setText(startTime.format(DATE_FORMAT));
+            if (!Duration.getText().isEmpty()) {
+                long durationMinutes = Long.parseLong(Duration.getText());
+                LocalDateTime startTime = endDate.minusMinutes(durationMinutes);
+                StartTime.setText(startTime.format(DATE_FORMAT));
+            }
         }
     }
 
@@ -211,7 +219,6 @@ public class EditItem extends JFrame {
             System.out.println("Invalid Duration Format: " + Duration.getText());
             return;
         }
-        long durationSeconds = durationMinutes * 60;
 
         LocalDateTime startDate = null;
         LocalDateTime endDate = null;
@@ -232,84 +239,27 @@ public class EditItem extends JFrame {
         if (lockRadioButton.isSelected()) {
             // StartTime locked, treat endTime as driven
             if (startDate != null) {
-                LocalDateTime endTime = startDate.plusSeconds(durationSeconds);
+                LocalDateTime endTime = startDate.plusMinutes(durationMinutes);
                 EndTime.setText(endTime.format(DATE_FORMAT));
             }
         } else if (lockRadioButton1.isSelected()) {
             // endtime locked, treat startTime as driven
             if (endDate != null) {
-                LocalDateTime startTime = endDate.plusSeconds(durationSeconds);
+                LocalDateTime startTime = endDate.minusMinutes(durationMinutes);
                 StartTime.setText(startTime.format(DATE_FORMAT));
             }
         } else if (lockRadioButton2.isSelected()) {
             // duration is locked, treat endTime as driven
             if (startDate != null) {
-                LocalDateTime endTime = startDate.plusSeconds(durationSeconds);
-                EndTime.setText(endTime.format(DATE_FORMAT));
+                LocalDateTime startTime = startDate.plusMinutes(durationMinutes);
+                EndTime.setText(startTime.format(DATE_FORMAT));
             }
         }
     }
 
     private static String getDurationString(LocalDateTime startDate, LocalDateTime endDate) {
-        long durationYears = startDate.until(endDate, ChronoUnit.YEARS);
-        long durationMonths = startDate.until(endDate, ChronoUnit.MONTHS) - (durationYears * 12);
-        long durationDays = startDate.until(endDate, ChronoUnit.DAYS) - (durationMonths * 30);
-        long durationHours = startDate.until(endDate, ChronoUnit.HOURS) - (durationDays * 24);
-        long durationMinutes = startDate.until(endDate, ChronoUnit.MINUTES) - (durationHours * 60);
-        long durationSeconds = startDate.until(endDate, ChronoUnit.SECONDS) - (durationMinutes * 60);
-
-        String durationString = "";
-        if (durationYears < 0) {
-            durationString += "0000-";
-        } else if (durationYears < 10) {
-            durationString += "000" + durationYears + "-";
-        } else if (durationYears < 100) {
-            durationString += "00" + durationYears + "-";
-        } else if (durationYears < 1000) {
-            durationString += "0" + durationYears + "-";
-        }
-
-        if (durationMonths < 0) {
-            durationString += "00-";
-        } else if (durationMonths < 10) {
-            durationString += "0" + durationMonths + "-";
-        } else {
-            durationString += durationMonths + "-";
-        }
-
-        if (durationDays < 0) {
-            durationString += "00 ";
-        } else if (durationDays < 10) {
-            durationString += "0" + durationDays + " ";
-        } else {
-            durationString += durationDays + " ";
-        }
-
-        if (durationHours < 0) {
-            durationString += "00:";
-        } else if (durationHours < 10) {
-            durationString += "0" + durationHours + ":";
-        } else {
-            durationString += durationHours + ":";
-        }
-
-        if (durationMinutes < 0) {
-            durationString += "00:";
-        } else if (durationMinutes < 10) {
-            durationString += "0" + durationMinutes + ":";
-        } else {
-            durationString += durationMinutes + ":";
-        }
-
-        if (durationSeconds < 0) {
-            durationString += "00:";
-        } else if (durationSeconds < 10) {
-            durationString += "0" + durationSeconds + ":";
-        } else {
-            durationString += durationSeconds;
-        }
-
-        return durationString;
+        long minutes = startDate.until(endDate, ChronoUnit.MINUTES);
+        return String.valueOf(minutes);
     }
 
     private int getTaskListIndexForDependency(TaskDependency dependency) {
@@ -362,20 +312,22 @@ public class EditItem extends JFrame {
 
     public EditItem(String newTitle, Task newTask, boolean editing, List<Task> tasks) {
         this.task = newTask;
+        this.editing = editing;
 
         setTitle(newTitle);
         if (editing) {
             createButton.setText("Update");
         } else {
             createButton.setText("Create");
-            long now = Instant.now().getEpochSecond();
+
+            long now = Instant.now().getEpochSecond() / 60;
 
             if (task.getStartTime() == 0) {
                 task.setStartTime(now);
             }
 
             if (task.getEndTime() == 0) {
-                task.setEndTime(now + 3600);
+                task.setEndTime(now + 10080);
             }
         }
 
@@ -425,7 +377,7 @@ public class EditItem extends JFrame {
                                 DATE_FORMAT
                         )
                         .atZone(ZoneId.systemDefault())
-                        .toEpochSecond()
+                        .toEpochSecond() / 60
         );
 
         task.setEndTime(
@@ -434,10 +386,9 @@ public class EditItem extends JFrame {
                                 DATE_FORMAT
                         )
                         .atZone(ZoneId.systemDefault())
-                        .toEpochSecond()
+                        .toEpochSecond() / 60
         );
-        // task.setStartTime(Instant.parse(StartTime.getText()).getEpochSecond()); // FIXME! Form validation does not expect timezone Z but required here
-        // task.setEndTime(Instant.parse(EndTime.getText()).getEpochSecond());
+
         task.setDuration(Long.parseLong(Duration.getText()));
         task.setLockStartTime(lockRadioButton.isSelected());
         task.setLockEndTime(lockRadioButton2.isSelected());

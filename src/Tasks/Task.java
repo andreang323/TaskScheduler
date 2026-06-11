@@ -13,9 +13,9 @@ public class Task {
     // The duration of the task in POSIX time.
     private long Duration;
     // If true, ensure this task starts at the given time.
-    private boolean LockStartTime;
+    private boolean LockStartTime = false;
     // If true, ensure this task ends at the given time.
-    private boolean LockEndTime;
+    private boolean LockEndTime = false;
     // Whether or not this task must be included in a solution.
     private boolean optional;
     // Priority of task

@@ -62,8 +62,8 @@ public class ScheduleSolver {
     }
 
     public List<Schedule> GenerateSchedules(List<Task> tasks, long scheduleStart, long scheduleEnd, int maxSolutions) {
-        Instant startInstant = Instant.ofEpochSecond(scheduleStart);
-        Instant endInstant = Instant.ofEpochSecond(scheduleEnd);
+        Instant startInstant = Instant.ofEpochSecond(scheduleStart * 60);
+        Instant endInstant = Instant.ofEpochSecond(scheduleEnd * 60);
         LocalDateTime startTime =
                 LocalDateTime.ofInstant(startInstant, ZoneId.of("UTC"));
         LocalDateTime endTime =
@@ -96,6 +96,15 @@ public class ScheduleSolver {
         // Set up lookup table for tasks
         Map<Integer, Task> taskMap = new HashMap<>();
         for (Task task : tasks){
+//            System.out.println(
+//                    "INPUT TASK: "
+//                            + task.getName()
+//                            + " start=" + task.getStartTime()
+//                            + " end=" + task.getEndTime()
+//                            + " duration=" + task.getDuration()
+//                            + " window=" + (task.getEndTime() - task.getStartTime())
+//                            + " optional=" + task.isOptional()
+//            );
             taskMap.put(task.getTaskID(), task);
 
             // Validate task:
@@ -269,6 +278,8 @@ public class ScheduleSolver {
         // else generate only maxSolutions amount of solutions
         int k = 0;
         while ((k < maxSolutions)|| (maxSolutions == 0)){
+//            Status status = s.check();
+//            System.out.println("SOLVER STATUS: " + status);
             if (s.check() == Status.SATISFIABLE){
                 Model m = s.getModel();
                 BoolExpr solution_c = ctx.mkTrue();
@@ -280,24 +291,23 @@ public class ScheduleSolver {
                     boolean isActive = active.isTrue();
 //                    System.out.println("Is active: "+ isActive);
                     IntNum tStart = (IntNum) m.evaluate(currentSolving.taskStart, true);
-                    int tStartInt = tStart.getInt();
+                    long tStartLong = Long.parseLong(tStart.toString());
                     IntNum tEnd = (IntNum) m.evaluate(currentSolving.taskEnd, true);
-                    int tEndInt = tEnd.getInt();
+                    long tEndLong = Long.parseLong(tEnd.toString());
 
                     // Only add this task as solved if it's active
                     if (isActive){
                         // init new solved task
-                        SolvedTask newSolvedTask = new SolvedTask(tasks.get(currentSolving.taskIndex), tStartInt, tEndInt);
-                        // System.out.println("active: " + isActive + " start time: " + tStartInt + " end time: " +  tEndInt);
-
+                        SolvedTask newSolvedTask = new SolvedTask(tasks.get(currentSolving.taskIndex), tStartLong, tEndLong);
+                        //System.out.println("active: " + isActive + " start time: " + tStartLong + " end time: " + tEndLong);
                         // add new solved task
                         solvedTaskList.add(newSolvedTask);
                     }
 
                     // add this solution to our new constraint
                     BoolExpr currentActive = ctx.mkEq(currentSolving.active, ctx.mkBool(isActive));
-                    BoolExpr currentTStart = ctx.mkEq(currentSolving.taskStart, ctx.mkInt(tStartInt));
-                    BoolExpr currentTEnd = ctx.mkEq(currentSolving.taskEnd, ctx.mkInt(tEndInt));
+                    BoolExpr currentTStart = ctx.mkEq(currentSolving.taskStart, ctx.mkInt(tStartLong));
+                    BoolExpr currentTEnd = ctx.mkEq(currentSolving.taskEnd, ctx.mkInt(tEndLong));
 
                     solution_c = ctx.mkAnd(solution_c, ctx.mkAnd(currentActive, ctx.mkAnd(currentTStart, currentTEnd)));
                 }
