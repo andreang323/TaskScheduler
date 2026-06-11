@@ -81,7 +81,16 @@ public class EditDependency extends JFrame {
     // Creates the panel for this JFrame.
     private JPanel createPanel(){
         panel = new JPanel();
-        panel.setLayout(new GridLayout(4, 2, 5, 10));
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.NORTH;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+
         taskLabel = new JLabel("Task: ");
         taskList = new JList<>(taskNames);
         typeLabel = new JLabel("Type: ");
@@ -92,17 +101,34 @@ public class EditDependency extends JFrame {
         JButton saveButton = new JButton("Save");
         JButton cancelButton = new JButton("Cancel");
 
-        panel.add(taskLabel);
-        panel.add(taskList);
+        panel.add(taskLabel, gbc);
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        panel.add(taskList, gbc);
+        gbc.gridy ++;
+        gbc.gridx = 0;
 
-        panel.add(typeLabel);
-        panel.add(typeList);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panel.add(typeLabel, gbc);
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.gridx = 1;
+        panel.add(typeList, gbc);
 
-        panel.add(timesLabel);
-        panel.add(timesField);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weighty = 0;
+        gbc.gridy ++;
+        gbc.gridx = 0;
+        panel.add(timesLabel, gbc);
+        gbc.gridx = 1;
+        panel.add(timesField, gbc);
+        gbc.gridy ++;
 
-        panel.add(saveButton);
-        panel.add(cancelButton);
+        gbc.anchor = GridBagConstraints.SOUTH;
+
+        gbc.gridx = 0;
+        panel.add(saveButton, gbc);
+        gbc.gridx = 1;
+        panel.add(cancelButton, gbc);
 
         // Load all info from dependency
         taskList.setSelectedIndex(selectedTaskIndex);
