@@ -188,7 +188,7 @@ public class ScheduleSolver {
                 if (matchingTasks.size() < repeats){
                     while (matchingTasks.size() < repeats){
                         // add another solving task with the correct taskID
-                        SolvingTask newTask = new SolvingTask(i, taskMap.get(matchID), ctx, scheduleStart, scheduleEnd);
+                        SolvingTask newTask = new SolvingTask(matchingTasks.getFirst().taskIndex, taskMap.get(matchID), ctx, scheduleStart, scheduleEnd);
                         solvingTaskList.add(newTask);
                         matchingTasks.add(newTask);
 
@@ -242,6 +242,8 @@ public class ScheduleSolver {
             }
             n ++;
         }
+
+        System.out.println(solvingTaskList);
 
         // Prevent tasks from overlapping
         // iterate through each list of task variables
