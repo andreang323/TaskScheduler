@@ -129,6 +129,9 @@ public class EditItem extends JFrame {
 
         if (!editing) {
             lockButtonGroup.clearSelection();
+
+            Priority.setText(String.valueOf(1));
+
         }
 
     }
