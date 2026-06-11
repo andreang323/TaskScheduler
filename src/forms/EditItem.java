@@ -2,6 +2,7 @@ package forms;
 
 import Tasks.Task;
 import Tasks.TaskDependency;
+import jdk.jfr.Description;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -73,6 +74,7 @@ public class EditItem extends JFrame {
             );
 
             Duration.setText(String.valueOf(task.getDuration()));
+            description.setText(task.getDescription());
             lockRadioButton.setSelected(task.isLockStartTime());
             lockRadioButton2.setSelected(task.isLockEndTime());
             Priority.setText(String.valueOf(task.getPriority()));
@@ -394,6 +396,7 @@ public class EditItem extends JFrame {
         task.setLockEndTime(lockRadioButton2.isSelected());
         task.setPriority(Integer.parseInt(Priority.getText()));
         task.setOptional(Optional.isSelected());
+        task.setDescription(description.getText());
 
         // Process dependencies
         List<List<String>> dependencyLists = List.of(

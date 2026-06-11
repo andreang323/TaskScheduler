@@ -8,7 +8,7 @@ public class TaskDependency {
         LOOSELY_AFTER
     }
 
-    private int DependencyTaskID;
+    private int DependencyTaskID = -1;
     private DependencyType type;
     private int RepeatCount = 1;
 

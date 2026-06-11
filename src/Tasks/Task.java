@@ -24,6 +24,7 @@ public class Task {
     private List<TaskDependency> dependencies;
     // Unique ID of task
     private int taskID;
+    private String Description;
 
     public String getName() {
         return Name;
@@ -31,6 +32,15 @@ public class Task {
 
     public void setName(String name) {
         Name = name;
+    }
+
+
+    public String getDescription() {
+        return Description;
+    }
+
+    public void setDescription(String description) {
+        Description = description;
     }
 
     public long getStartTime() {
@@ -118,6 +128,7 @@ public class Task {
         newCopy.priority = priority;
         newCopy.dependencies= dependencies;
         newCopy.taskID = taskID;
+        newCopy.Description = Description;
         return newCopy;
     }
     
