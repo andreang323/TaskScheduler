@@ -2,7 +2,6 @@ package forms;
 
 import Tasks.Task;
 import Tasks.TaskDependency;
-import jdk.jfr.Description;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,8 +41,8 @@ public class EditItem extends JFrame {
     private JList<String> dependsOn;
     private JCheckBox Optional;
     private JLabel timeNote1;
-    private JLabel timeNote2;
     private JEditorPane description;
+    private JButton manageDependanciesButton;
     private TimeLockListener timeLockListener;
     private SaveButtonListener saveButtonListener;
     private Task task;
@@ -294,17 +293,17 @@ public class EditItem extends JFrame {
         }
     }
 
-    private void restoreDependencySelections() {
-        mustImmediatelyFollow.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        mustImmediatelyPrecede.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        mustPrecede.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        mustFollow.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-
-        selectDependencyValues(mustImmediatelyFollow, TaskDependency.DependencyType.IMMEDIATELY_AFTER);
-        selectDependencyValues(mustImmediatelyPrecede, TaskDependency.DependencyType.IMMEDIATELY_BEFORE);
-        selectDependencyValues(mustPrecede, TaskDependency.DependencyType.LOOSELY_BEFORE);
-        selectDependencyValues(mustFollow, TaskDependency.DependencyType.LOOSELY_AFTER);
-    }
+//    private void restoreDependencySelections() {
+//        mustImmediatelyFollow.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+//        mustImmediatelyPrecede.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+//        mustPrecede.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+//        mustFollow.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+//
+//        selectDependencyValues(mustImmediatelyFollow, TaskDependency.DependencyType.IMMEDIATELY_AFTER);
+//        selectDependencyValues(mustImmediatelyPrecede, TaskDependency.DependencyType.IMMEDIATELY_BEFORE);
+//        selectDependencyValues(mustPrecede, TaskDependency.DependencyType.LOOSELY_BEFORE);
+//        selectDependencyValues(mustFollow, TaskDependency.DependencyType.LOOSELY_AFTER);
+//    }
 
     public EditItem(String newTitle, Task newTask, boolean editing, List<Task> tasks) {
         this.task = newTask;
@@ -337,13 +336,13 @@ public class EditItem extends JFrame {
 
         // Populate depeandcy lists with data
 //        isDependedOn.setListData(taskNames);
-        mustImmediatelyFollow.setListData(taskNames);
-        mustImmediatelyPrecede.setListData(taskNames);
-        mustPrecede.setListData(taskNames);
-        mustFollow.setListData(taskNames);
+//        mustImmediatelyFollow.setListData(taskNames);
+//        mustImmediatelyPrecede.setListData(taskNames);
+//        mustPrecede.setListData(taskNames);
+//        mustFollow.setListData(taskNames);
 //        dependsOn.setListData(taskNames);
 
-        restoreDependencySelections();
+//        restoreDependencySelections();
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setContentPane(contentPane);
