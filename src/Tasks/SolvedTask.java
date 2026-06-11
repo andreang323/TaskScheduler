@@ -70,20 +70,18 @@ public class SolvedTask implements Comparable <SolvedTask>{
     ) {
         float calculatedScore = OriginalTask.getPriority();
 
-        long actualDuration = EndTime - StartTime;
+        //long actualDuration = EndTime - StartTime;
 
         long startDifference = Math.abs(StartTime - OriginalTask.getStartTime());
-        long endDifference = Math.abs(EndTime - OriginalTask.getEndTime());
-        long durationDifference = Math.abs(actualDuration - OriginalTask.getDuration());
+        //long endDifference = Math.abs(EndTime - OriginalTask.getEndTime());
+        //long durationDifference = Math.abs(actualDuration - OriginalTask.getDuration());
 
         // difference in hours
         float startPenalty = startDifference / 3600.0f;
-        float endPenalty = endDifference / 3600.0f;
-        float durationPenalty = durationDifference / 3600.0f;
+        //float endPenalty = endDifference / 3600.0f;
+        //float durationPenalty = durationDifference / 3600.0f;
 
-        float totalPenalty = startPenalty + endPenalty + durationPenalty;
-
-        calculatedScore = calculatedScore / (1.0f + totalPenalty);
+        calculatedScore = calculatedScore / (1.0f + startPenalty);
 
         this.score = calculatedScore;
     }

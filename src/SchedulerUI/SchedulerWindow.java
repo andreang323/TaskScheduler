@@ -37,7 +37,7 @@ public class SchedulerWindow extends JFrame {
     private int maxSolutions = 100;
 
     private static final DateTimeFormatter DATE_FORMAT =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     
     public SchedulerWindow(){
         setTitle("Task Scheduler");
@@ -223,7 +223,7 @@ public class SchedulerWindow extends JFrame {
             catch (Exception ex) {
                 JOptionPane.showMessageDialog(
                         this,
-                        "Use format: yyyy-MM-dd HH:mm:ss\nExample: 2026-06-09 08:00:00",
+                        "Use format: yyyy-MM-dd HH:mm\nExample: 2026-06-09 08:00",
                         "Invalid Date",
                         JOptionPane.ERROR_MESSAGE
                 );

@@ -2,6 +2,10 @@ package SchedulerUI;
 
 import Tasks.*;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import com.microsoft.z3.*;
@@ -58,7 +62,18 @@ public class ScheduleSolver {
     }
 
     public List<Schedule> GenerateSchedules(List<Task> tasks, long scheduleStart, long scheduleEnd, int maxSolutions) {
-        System.out.println("Starting with schedule from " + scheduleStart + " to " + scheduleEnd);
+        Instant startInstant = Instant.ofEpochSecond(scheduleStart);
+        Instant endInstant = Instant.ofEpochSecond(scheduleEnd);
+        LocalDateTime startTime =
+                LocalDateTime.ofInstant(startInstant, ZoneId.of("UTC"));
+        LocalDateTime endTime =
+                LocalDateTime.ofInstant(endInstant, ZoneId.of("UTC"));
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String formattedStart = startTime.format(formatter);
+        String formattedEnd = endTime.format(formatter);
+
+        System.out.println("Starting with schedule from " + formattedStart + " to " + formattedEnd);
         // Validate given input
         if (scheduleEnd <= scheduleStart){
             System.out.println("ERROR: ScheduleStart is equal or greater than ScheduleEnd.");
