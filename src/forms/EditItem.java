@@ -309,6 +309,54 @@ public class EditItem extends JFrame {
         return durationString;
     }
 
+    private int getTaskListIndexForDependency(TaskDependency dependency) {
+        if (dependency == null || tasks == null) {
+            return -1;
+        }
+
+        for (int i = 0; i < tasks.size(); i++) {
+            if (tasks.get(i).getTaskID() == dependency.getDependencyTaskID()) {
+                return i + 1; // +1 because taskNames[0] is [None]
+            }
+        }
+
+        return -1;
+    }
+
+    private void selectDependencyValues(JList<String> list, TaskDependency.DependencyType type) {
+        if (task == null || task.getDependencies() == null) {
+            return;
+        }
+
+        List<Integer> selectedIndices = new ArrayList<>();
+
+        for (TaskDependency dependency : task.getDependencies()) {
+            if (dependency.getType() == type) {
+                int index = getTaskListIndexForDependency(dependency);
+                if (index >= 0) {
+                    selectedIndices.add(index);
+                }
+            }
+        }
+
+        if (!selectedIndices.isEmpty()) {
+            int[] indices = selectedIndices.stream().mapToInt(Integer::intValue).toArray();
+            list.setSelectedIndices(indices);
+        }
+    }
+
+    private void restoreDependencySelections() {
+        mustImmediatelyFollow.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        mustImmediatelyPrecede.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        mustPrecede.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        mustFollow.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+        selectDependencyValues(mustImmediatelyFollow, TaskDependency.DependencyType.IMMEDIATELY_AFTER);
+        selectDependencyValues(mustImmediatelyPrecede, TaskDependency.DependencyType.IMMEDIATELY_BEFORE);
+        selectDependencyValues(mustPrecede, TaskDependency.DependencyType.LOOSELY_BEFORE);
+        selectDependencyValues(mustFollow, TaskDependency.DependencyType.LOOSELY_AFTER);
+    }
+
     public EditItem(String newTitle, Task newTask, boolean editing, List<Task> tasks) {
         this.task = newTask;
 
@@ -344,39 +392,7 @@ public class EditItem extends JFrame {
         mustFollow.setListData(taskNames);
 //        dependsOn.setListData(taskNames);
 
-        // FIXME: Does not select tasks on edit
-//        for(TaskDependency dependency : task.getDependencies()) {
-//            if(dependency.getType() == TaskDependency.DependencyType.IMMEDIATELY_AFTER) {
-//                mustImmediatelyFollow.setSelectedIndex(mustImmediatelyFollow.);
-//            }
-//        }
-
-        // Select dependency items in the lists when editing
-        List<Integer> selectedIndices = new ArrayList<>();
-        if (task.getDependencies() != null) {
-            for (TaskDependency dependency : task.getDependencies()) {
-                if (dependency.getType() == TaskDependency.DependencyType.IMMEDIATELY_AFTER) {
-                    // find the task in `tasks` with the same TaskID
-                    int foundIndex = -1;
-                    for (int i = 0; i < tasks.size(); i++) {
-                        if (tasks.get(i).getTaskID() == dependency.getDependencyTaskID()) {
-                            foundIndex = i;
-                            break;
-                        }
-                    }
-                    if (foundIndex != -1) {
-                        // +1 because taskNames[0] == "[None]" and we shifted tasks by 1
-                        selectedIndices.add(foundIndex + 1);
-                    }
-                }
-            }
-
-            // apply selections (if any)
-            if (!selectedIndices.isEmpty()) {
-                int[] sel = selectedIndices.stream().mapToInt(Integer::intValue).toArray();
-                mustImmediatelyFollow.setSelectedIndices(sel);
-            }
-        }
+        restoreDependencySelections();
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setContentPane(contentPane);
@@ -452,7 +468,7 @@ public class EditItem extends JFrame {
                 for (String name : dependencyLists.get(i)) {
                     // Iterate over dependency names of a specific type
                     System.out.println("    Inspecting selected dependency: " + name);
-                    if (name.equals("[NONE")) {
+                    if (name.equals("[NONE]")) {
                         break;
                     } else if (name.equals(task.getName())) {
                         TaskDependency dependency = new TaskDependency();
