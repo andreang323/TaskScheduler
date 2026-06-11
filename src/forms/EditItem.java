@@ -140,6 +140,20 @@ public class EditItem extends JFrame {
                     task.setDependencies(new ArrayList<>());
                 }
 
+                for (TaskDependency existing : task.getDependencies()) {
+                    if (existing.getDependencyTaskID() == dependency.getDependencyTaskID()
+                            && existing.getType() == dependency.getType()) {
+
+                        JOptionPane.showMessageDialog(
+                                this,
+                                "This dependency already exists.",
+                                "Duplicate Dependency",
+                                JOptionPane.ERROR_MESSAGE
+                        );
+                        return;
+                    }
+                }
+
                 task.getDependencies().add(dependency);
 
                 System.out.println("Added dependency: " + dependency);
