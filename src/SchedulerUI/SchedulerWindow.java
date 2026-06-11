@@ -415,8 +415,8 @@ public class SchedulerWindow extends JFrame {
         panel.add(new JLabel("End: " + formatUnixTime(solvedTask.getEndTime())));
         panel.add(new JLabel("Score: " + solvedTask.getScore()));
 
-        System.out.println("displayed start: " + solvedTask.getStartTime());
-        System.out.println("displayed end: " + solvedTask.getEndTime());
+//        System.out.println("displayed start: " + solvedTask.getStartTime());
+//        System.out.println("displayed end: " + solvedTask.getEndTime());
 
         return panel;
     }

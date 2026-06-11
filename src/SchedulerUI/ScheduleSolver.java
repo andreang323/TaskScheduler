@@ -13,6 +13,8 @@ import com.microsoft.z3.*;
 public class ScheduleSolver {
 
     private static class SolvingTask{
+        static int globalSolvingTaskID = 0;
+        int solvingTaskID = 0;
         int taskIndex;
         int taskID;
         BoolExpr active;
@@ -23,10 +25,12 @@ public class ScheduleSolver {
 
         public SolvingTask(int taskIndex, Task task, Context ctx, long scheduleStart, long scheduleEnd) {
             this.taskIndex = taskIndex;
+            this.solvingTaskID = globalSolvingTaskID;
+            globalSolvingTaskID ++;
             this.taskID = task.getTaskID();
-            this.active = ctx.mkBoolConst("active" + taskIndex);
-            this.taskStart = ctx.mkIntConst("taskStart" + taskIndex);
-            this.taskEnd = ctx.mkIntConst("taskEnd" + taskIndex);
+            this.active = ctx.mkBoolConst("active" + taskIndex + "_" + solvingTaskID);
+            this.taskStart = ctx.mkIntConst("taskStart" + taskIndex + "_" + solvingTaskID);
+            this.taskEnd = ctx.mkIntConst("taskEnd" + taskIndex + "_" + solvingTaskID);
             this.dependencyListTerms = new ArrayList<>();
 
             taskConstraints = ctx.mkTrue();
@@ -197,7 +201,6 @@ public class ScheduleSolver {
 
                 // for each matching task:
                 ArithExpr[] terms = new ArithExpr[matchingTasks.size()];
-                Expr dependenciesSatisfied = ctx.mkTrue();
                 for (int m = 0; m < matchingTasks.size(); m++){
                     // add a term
                     SolvingTask matchingTask = matchingTasks.get(m);
@@ -242,8 +245,6 @@ public class ScheduleSolver {
             }
             n ++;
         }
-
-        System.out.println(solvingTaskList);
 
         // Prevent tasks from overlapping
         // iterate through each list of task variables
