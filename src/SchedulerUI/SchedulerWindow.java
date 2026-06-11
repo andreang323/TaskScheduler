@@ -365,13 +365,26 @@ public class SchedulerWindow extends JFrame {
         } else {
             Schedule currentSchedule = schedules.get(currentScheduleIndex);
 
+            JPanel headerPanel = new JPanel(new BorderLayout());
+
             JLabel header = new JLabel(
                     "Schedule " + (currentScheduleIndex + 1)
                             + " of " + schedules.size()
             );
 
-            header.setBorder(BorderFactory.createEmptyBorder(5, 5, 10, 5));
-            scheduleListPane.add(header);
+            JLabel scoreHeader = new JLabel(
+                    "Score: " + currentSchedule.getPriorityScore()
+            );
+
+            headerPanel.add(header, BorderLayout.WEST);
+            headerPanel.add(scoreHeader, BorderLayout.EAST);
+
+            headerPanel.setMaximumSize(
+                    new Dimension(Integer.MAX_VALUE, 30)
+            );
+
+            scheduleListPane.add(headerPanel);
+
 
             for (SolvedTask solvedTask : currentSchedule.getTaskList()) {
                 scheduleListPane.add(createSolvedTaskPanel(solvedTask));
@@ -381,6 +394,7 @@ public class SchedulerWindow extends JFrame {
 
         scheduleListPane.revalidate();
         scheduleListPane.repaint();
+
     }
 
     private JPanel createSolvedTaskPanel(SolvedTask solvedTask) {
@@ -398,6 +412,10 @@ public class SchedulerWindow extends JFrame {
         panel.add(new JLabel("Task: " + solvedTask.getName()));
         panel.add(new JLabel("Start: " + formatUnixTime(solvedTask.getStartTime())));
         panel.add(new JLabel("End: " + formatUnixTime(solvedTask.getEndTime())));
+        panel.add(new JLabel("Score: " + solvedTask.getScore()));
+
+        System.out.println("displayed start: " + solvedTask.getStartTime());
+        System.out.println("displayed end: " + solvedTask.getEndTime());
 
         return panel;
     }
@@ -411,12 +429,12 @@ public class SchedulerWindow extends JFrame {
 
         return dateTime
                 .atZone(ZoneId.systemDefault())
-                .toEpochSecond();
+                .toEpochSecond() / 60;
     }
 
     private String formatUnixTime(long unixTime) {
         return LocalDateTime.ofInstant(
-                Instant.ofEpochSecond(unixTime),
+                Instant.ofEpochSecond(unixTime * 60),
                 ZoneId.systemDefault()
         ).format(DATE_FORMAT);
     }

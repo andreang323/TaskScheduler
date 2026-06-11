@@ -227,7 +227,7 @@
               <text value=""/>
             </properties>
           </component>
-          <component id="b8018" class="javax.swing.JRadioButton" binding="lockRadioButton" default-binding="true">
+          <component id="cbbbc" class="javax.swing.JCheckBox" binding="lockCheckBox" default-binding="true">
             <constraints>
               <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -270,7 +270,7 @@
               <text value=""/>
             </properties>
           </component>
-          <component id="4289d" class="javax.swing.JRadioButton" binding="lockRadioButton1" default-binding="true">
+          <component id="8fe4b" class="javax.swing.JCheckBox" binding="lockCheckBox1" default-binding="true">
             <constraints>
               <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -278,7 +278,7 @@
               <text value="Lock"/>
             </properties>
           </component>
-          <component id="31bb4" class="javax.swing.JRadioButton" binding="lockRadioButton2" default-binding="true">
+          <component id="3b978" class="javax.swing.JCheckBox" binding="lockCheckBox2" default-binding="true">
             <constraints>
               <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
