@@ -158,11 +158,47 @@ public class ScheduleSolver {
                 v++;
                 continue;
             }
+
+            Map<Integer, Integer[]> repeatTracker = new HashMap<>();
+
             // For each dependency:
             for (int p = 0; p < dependencies.size(); p++) {
                 // current dependency
                 TaskDependency dependency = dependencies.get(p);
                 int repeats = dependency.getRepeatCount();
+                Integer[] currentRepeats = repeatTracker.computeIfAbsent(dependency.getDependencyTaskID(), k -> new Integer[]{0, 0});
+                switch (dependency.getType()){
+                    case LOOSELY_AFTER, IMMEDIATELY_AFTER:
+                        // We don't need to add more if we're guaranteed
+                        // to already have enough tasks afterward
+                        if (currentRepeats[1] > repeats){
+                            continue;
+                        }
+                        // Replace with new known repeat max
+                        else{
+                            currentRepeats[1] = repeats;
+                            repeatTracker.put(dependency.getDependencyTaskID(), currentRepeats);
+                        }
+                        break;
+
+                    case LOOSELY_BEFORE, IMMEDIATELY_BEFORE:
+                        // We don't need to add more if we're guaranteed
+                        // to already have enough tasks before
+                        if (currentRepeats[0] > repeats){
+                            continue;
+                        }
+                        // Replace with new known repeat max
+                        else{
+                            currentRepeats[0] = repeats;
+                            repeatTracker.put(dependency.getDependencyTaskID(), currentRepeats);
+                        }
+                        break;
+                }
+
+                // before and after repeats are mutually exclusive
+                // so we must guarantee we have enough repeats for both sides
+                repeats = currentRepeats[0] + currentRepeats[1];
+
                 // Invalid dependencies can cause a cascading effect and
                 // I honestly have no interest in propagating invalidation
                 // up the tree so we will kill it here
