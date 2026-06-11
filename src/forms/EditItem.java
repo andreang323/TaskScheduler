@@ -53,10 +53,8 @@ public class EditItem extends JFrame {
     private LocalDateTime date = LocalDateTime.now();
     private boolean editing;
     private static final DateTimeFormatter DATE_FORMAT =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private List<Task> tasks;
-
-    private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder().appendPattern("yyyy-MM-dd").optionalStart().appendLiteral('T').optionalStart().appendPattern("HH:mm").appendLiteral(':').appendValue(ChronoField.SECOND_OF_MINUTE, 2).optionalEnd().toFormatter();
 
     public void setupPanel() {
 
@@ -80,7 +78,7 @@ public class EditItem extends JFrame {
             // EndTime.setText(LocalDateTime.ofInstant(Instant.ofEpochSecond(task.getEndTime()), java.time.ZoneId.systemDefault()).format(FORMATTER));
             // StartTime.setText(LocalDateTime.ofInstant(Instant.ofEpochSecond(task.getStartTime()), ZoneId.systemDefault()).format(FORMATTER));
             // EndTime.setText(LocalDateTime.ofInstant(Instant.ofEpochSecond(task.getEndTime()), ZoneId.systemDefault()).format(FORMATTER));
-            Duration.setText(String.valueOf(task.getDuration()));
+            Duration.setText(String.valueOf(task.getDuration() / 60));
             lockRadioButton.setSelected(task.isLockStartTime());
             lockRadioButton2.setSelected(task.isLockEndTime());
             Priority.setText(String.valueOf(task.getPriority()));
@@ -136,20 +134,16 @@ public class EditItem extends JFrame {
             System.out.println("Invalid Start Time Format: " + StartTime.getText());
             return;
         }
-        LocalDateTime startDate = LocalDateTime.parse("2000-01-01T00:00:00", FORMATTER);
+        LocalDateTime startDate = null;
         try {
-            startDate = LocalDateTime.parse(StartTime.getText(), FORMATTER);
+            startDate = LocalDateTime.parse(StartTime.getText(), DATE_FORMAT);
         } catch (DateTimeParseException e) {
             System.out.println("Invalid Start Time Format: " + StartTime.getText());
             return;
         }
         LocalDateTime endDate = startDate.plusHours(1);
         if (!EndTime.getText().isEmpty()) {
-            endDate = LocalDateTime.parse(EndTime.getText(), FORMATTER);
-        }
-        LocalDateTime durationAsDate = LocalDateTime.parse("2000-01-01T00:00:00", FORMATTER);
-        if (!Duration.getText().isEmpty()) {
-            durationAsDate = LocalDateTime.parse(Duration.getText(), FORMATTER);
+            endDate = LocalDateTime.parse(EndTime.getText(), DATE_FORMAT);
         }
 
         if (lockRadioButton.isSelected()) {
@@ -162,7 +156,7 @@ public class EditItem extends JFrame {
             // duration locked, treat end time as driven
             long durationSeconds = startDate.until(endDate, ChronoUnit.SECONDS);
             LocalDateTime endTime = startDate.minusSeconds(durationSeconds);
-            EndTime.setText(endTime.format(FORMATTER));
+            EndTime.setText(endTime.format(DATE_FORMAT));
         }
     }
 
@@ -174,9 +168,9 @@ public class EditItem extends JFrame {
             System.out.println("Invalid Ends Time Format: " + EndTime.getText());
             return;
         }
-        LocalDateTime endDate = LocalDateTime.parse("2000-01-01T00:00:00", FORMATTER);
+        LocalDateTime endDate = null;
         try {
-            endDate = LocalDateTime.parse(EndTime.getText(), FORMATTER);
+            endDate = LocalDateTime.parse(EndTime.getText(), DATE_FORMAT);
         } catch (DateTimeParseException e) {
             System.out.println("Invalid Ends Time Format: " + EndTime.getText());
             return;
@@ -184,11 +178,7 @@ public class EditItem extends JFrame {
 
         LocalDateTime startDate = endDate.minusHours(1);
         if (!StartTime.getText().isEmpty()) {
-            startDate = LocalDateTime.parse(StartTime.getText(), FORMATTER);
-        }
-        LocalDateTime durationAsDate = LocalDateTime.parse("2000-01-01T00:00:00", FORMATTER);
-        if (!Duration.getText().isEmpty()) {
-            durationAsDate = LocalDateTime.parse(Duration.getText(), FORMATTER);
+            startDate = LocalDateTime.parse(StartTime.getText(), DATE_FORMAT);
         }
 
         if (lockRadioButton.isSelected()) {
@@ -201,7 +191,7 @@ public class EditItem extends JFrame {
             // duration is locked, treat start time as driven
             long durationSeconds = startDate.until(endDate, ChronoUnit.SECONDS);
             LocalDateTime startTime = endDate.plusSeconds(durationSeconds);
-            EndTime.setText(startTime.format(FORMATTER));
+            EndTime.setText(startTime.format(DATE_FORMAT));
         }
     }
 
@@ -213,37 +203,50 @@ public class EditItem extends JFrame {
             System.out.println("Invalid Duration Time Format: " + Duration.getText());
             return;
         }
-        LocalDateTime durationAsDate = LocalDateTime.parse("2000-01-01T00:00:00", FORMATTER); // FIXME! Don't want it to be 2000 years lol
+        long durationMinutes;
+
         try {
-            durationAsDate = LocalDateTime.parse(Duration.getText(), FORMATTER);
-        } catch (DateTimeParseException e) {
-            System.out.println("Invalid Duration Time Format: " + Duration.getText());
+            durationMinutes = Long.parseLong(Duration.getText());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid Duration Format: " + Duration.getText());
             return;
         }
-        long durationSeconds = Math.abs(durationAsDate.until(LocalDateTime.parse("2000-01-01T00:00:00", FORMATTER), ChronoUnit.SECONDS));
+        long durationSeconds = durationMinutes * 60;
 
-        LocalDateTime startDate = LocalDateTime.parse("2000-01-01T00:00:00", FORMATTER);
-        if (!StartTime.getText().isEmpty()) {
-            startDate = LocalDateTime.parse(StartTime.getText(), FORMATTER);
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = null;
+        try {
+            if (!StartTime.getText().isEmpty()) {
+                startDate = LocalDateTime.parse(StartTime.getText(), DATE_FORMAT);
+            }
 
+            if (!EndTime.getText().isEmpty()) {
+                endDate = LocalDateTime.parse(EndTime.getText(), DATE_FORMAT);
+            }
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid Start/End Time Format");
+            return;
         }
-        LocalDateTime endDate = startDate.plusSeconds(durationSeconds);
-        if (!EndTime.getText().isEmpty()) {
-            endDate = LocalDateTime.parse(EndTime.getText(), FORMATTER);
-        }
+
 
         if (lockRadioButton.isSelected()) {
             // StartTime locked, treat endTime as driven
-            LocalDateTime endTime = startDate.plusSeconds(durationSeconds);
-            EndTime.setText(endTime.format(FORMATTER));
+            if (startDate != null) {
+                LocalDateTime endTime = startDate.plusSeconds(durationSeconds);
+                EndTime.setText(endTime.format(DATE_FORMAT));
+            }
         } else if (lockRadioButton1.isSelected()) {
             // endtime locked, treat startTime as driven
-            LocalDateTime startTime = endDate.plusSeconds(durationSeconds);
-            StartTime.setText(startTime.format(FORMATTER));
+            if (endDate != null) {
+                LocalDateTime startTime = endDate.plusSeconds(durationSeconds);
+                StartTime.setText(startTime.format(DATE_FORMAT));
+            }
         } else if (lockRadioButton2.isSelected()) {
             // duration is locked, treat endTime as driven
-            LocalDateTime endTime = startDate.plusSeconds(durationSeconds);
-            EndTime.setText(endTime.format(FORMATTER));
+            if (startDate != null) {
+                LocalDateTime endTime = startDate.plusSeconds(durationSeconds);
+                EndTime.setText(endTime.format(DATE_FORMAT));
+            }
         }
     }
 
@@ -435,7 +438,7 @@ public class EditItem extends JFrame {
         );
         // task.setStartTime(Instant.parse(StartTime.getText()).getEpochSecond()); // FIXME! Form validation does not expect timezone Z but required here
         // task.setEndTime(Instant.parse(EndTime.getText()).getEpochSecond());
-        task.setDuration(Long.parseLong(Duration.getText()));
+        task.setDuration(Long.parseLong(Duration.getText()) * 60);
         task.setLockStartTime(lockRadioButton.isSelected());
         task.setLockEndTime(lockRadioButton2.isSelected());
         task.setPriority(Integer.parseInt(Priority.getText()));
