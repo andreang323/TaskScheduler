@@ -27,9 +27,10 @@ public class EditItem extends JFrame {
     private JTextField EndTime;
     private JTextField Duration;
 
-    private JCheckBox lockCheckBox;
-    private JCheckBox lockCheckBox1;
-    private JCheckBox lockCheckBox2;
+    private ButtonGroup lockButtonGroup;
+    private JRadioButton lockRadioButton;
+    private JRadioButton lockRadioButton1;
+    private JRadioButton lockRadioButton2;
 
     private JTextField Priority;
     private JList<String> isDependedOn;
@@ -72,8 +73,8 @@ public class EditItem extends JFrame {
             );
 
             Duration.setText(String.valueOf(task.getDuration()));
-            lockCheckBox.setSelected(task.isLockStartTime());
-            lockCheckBox2.setSelected(task.isLockEndTime());
+            lockRadioButton.setSelected(task.isLockStartTime());
+            lockRadioButton2.setSelected(task.isLockEndTime());
             Priority.setText(String.valueOf(task.getPriority()));
             Optional.setSelected(task.isOptional());
         }
@@ -118,6 +119,16 @@ public class EditItem extends JFrame {
                 handleDurationChange();
             }
         });
+
+        lockButtonGroup = new ButtonGroup();
+        lockButtonGroup.add(lockRadioButton);
+        lockButtonGroup.add(lockRadioButton1);
+        lockButtonGroup.add(lockRadioButton2);
+
+        if (!editing) {
+            lockButtonGroup.clearSelection();
+        }
+
     }
 
     public void handleStartTimeChange() {
@@ -139,13 +150,13 @@ public class EditItem extends JFrame {
             endDate = LocalDateTime.parse(EndTime.getText(), DATE_FORMAT);
         }
 
-        if (lockCheckBox.isSelected()) {
+        if (lockRadioButton.isSelected()) {
             // StartTime locked, treat duration as driven
             Duration.setText(getDurationString(startDate, endDate));
-        } else if (lockCheckBox1.isSelected()) {
+        } else if (lockRadioButton1.isSelected()) {
             // endtime locked, treat duration as driven
             Duration.setText(getDurationString(startDate, endDate));
-        } else if (lockCheckBox2.isSelected()) {
+        } else if (lockRadioButton2.isSelected()) {
             // duration locked, treat end time as driven
             if (!Duration.getText().isEmpty()) {
                 long durationMinutes = Long.parseLong(Duration.getText());
@@ -177,13 +188,13 @@ public class EditItem extends JFrame {
             startDate = LocalDateTime.parse(StartTime.getText(), DATE_FORMAT);
         }
 
-        if (lockCheckBox.isSelected()) {
+        if (lockRadioButton.isSelected()) {
             // StartTime locked, treat duration as driven
             Duration.setText(getDurationString(startDate, endDate));
-        } else if (lockCheckBox1.isSelected()) {
+        } else if (lockRadioButton1.isSelected()) {
             // endtime locked, treat duration as driven
             Duration.setText(getDurationString(startDate, endDate));
-        } else if (lockCheckBox2.isSelected()) {
+        } else if (lockRadioButton2.isSelected()) {
             if (!Duration.getText().isEmpty()) {
                 long durationMinutes = Long.parseLong(Duration.getText());
                 LocalDateTime startTime = endDate.minusMinutes(durationMinutes);
@@ -225,19 +236,19 @@ public class EditItem extends JFrame {
         }
 
 
-        if (lockCheckBox.isSelected()) {
+        if (lockRadioButton.isSelected()) {
             // StartTime locked, treat endTime as driven
             if (startDate != null) {
                 LocalDateTime endTime = startDate.plusMinutes(durationMinutes);
                 EndTime.setText(endTime.format(DATE_FORMAT));
             }
-        } else if (lockCheckBox1.isSelected()) {
+        } else if (lockRadioButton1.isSelected()) {
             // endtime locked, treat startTime as driven
             if (endDate != null) {
                 LocalDateTime startTime = endDate.minusMinutes(durationMinutes);
                 StartTime.setText(startTime.format(DATE_FORMAT));
             }
-        } else if (lockCheckBox2.isSelected()) {
+        } else if (lockRadioButton2.isSelected()) {
             // duration is locked, treat endTime as driven
             if (startDate != null) {
                 LocalDateTime startTime = startDate.plusMinutes(durationMinutes);
@@ -301,12 +312,14 @@ public class EditItem extends JFrame {
 
     public EditItem(String newTitle, Task newTask, boolean editing, List<Task> tasks) {
         this.task = newTask;
+        this.editing = editing;
 
         setTitle(newTitle);
         if (editing) {
             createButton.setText("Update");
         } else {
             createButton.setText("Create");
+
             long now = Instant.now().getEpochSecond() / 60;
 
             if (task.getStartTime() == 0) {
@@ -377,8 +390,8 @@ public class EditItem extends JFrame {
         );
 
         task.setDuration(Long.parseLong(Duration.getText()));
-        task.setLockStartTime(lockCheckBox.isSelected());
-        task.setLockEndTime(lockCheckBox2.isSelected());
+        task.setLockStartTime(lockRadioButton.isSelected());
+        task.setLockEndTime(lockRadioButton2.isSelected());
         task.setPriority(Integer.parseInt(Priority.getText()));
         task.setOptional(Optional.isSelected());
 
