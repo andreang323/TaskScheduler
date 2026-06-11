@@ -33,6 +33,10 @@ public class EditDependency extends JFrame {
     JLabel timesLabel;
     JTextField timesField;
 
+    public void setSaveButtonListener(DependencySaveButtonListener listener) {
+        this.dependencySaveButtonListener = listener;
+    }
+
     // Constructor that sets up list displays and internal map as well as title
     public EditDependency(List<Task> tasks, TaskDependency dependency, String title, String ownerName){
         // Generate our task names and taskID map
@@ -165,6 +169,9 @@ public class EditDependency extends JFrame {
             );
             return;
         }
+
+        // it's just easier if it knows
+        dependency.setTaskName(taskNames[taskList.getSelectedIndex()]);
 
         // Set TaskID (this should never be -1 because we select 0 by default)
         dependency.setDependencyTaskID(taskIDMap.get(taskNames[taskList.getSelectedIndex()]));

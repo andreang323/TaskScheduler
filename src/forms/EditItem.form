@@ -42,22 +42,25 @@
       </hspacer>
       <vspacer id="4a973">
         <constraints>
-          <grid row="0" column="1" row-span="1" col-span="5" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
+          <grid row="0" column="1" row-span="1" col-span="5" vsize-policy="2" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
             <minimum-size width="-1" height="10"/>
+            <maximum-size width="-1" height="10"/>
           </grid>
         </constraints>
       </vspacer>
       <vspacer id="2a3f7">
         <constraints>
-          <grid row="6" column="1" row-span="1" col-span="2" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
+          <grid row="6" column="1" row-span="1" col-span="2" vsize-policy="2" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
             <minimum-size width="-1" height="10"/>
+            <maximum-size width="-1" height="10"/>
           </grid>
         </constraints>
       </vspacer>
       <vspacer id="27f78">
         <constraints>
-          <grid row="8" column="1" row-span="1" col-span="4" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
+          <grid row="8" column="1" row-span="1" col-span="2" vsize-policy="2" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
             <minimum-size width="-1" height="10"/>
+            <maximum-size width="-1" height="10"/>
           </grid>
         </constraints>
       </vspacer>
@@ -201,7 +204,9 @@
       </component>
       <scrollpane id="fc70c" binding="dependencyScrollPane">
         <constraints>
-          <grid row="5" column="1" row-span="1" col-span="4" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <grid row="5" column="1" row-span="1" col-span="4" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false">
+            <minimum-size width="-1" height="40"/>
+          </grid>
         </constraints>
         <properties>
           <background color="-1"/>
@@ -218,9 +223,9 @@
           <text value="Dependencies"/>
         </properties>
       </component>
-      <component id="86e65" class="javax.swing.JButton" binding="addDependencyButton">
+      <component id="f95d2" class="javax.swing.JButton" binding="addDependencyButton">
         <constraints>
-          <grid row="4" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="4" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="Add Dependency"/>
