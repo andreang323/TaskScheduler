@@ -150,7 +150,7 @@ public class ScheduleSolver {
             Task baseTask = tasks.get(solvingTask.taskIndex);
             List<TaskDependency> dependencies = baseTask.getDependencies();
             // No dependencies? go on
-            if (dependencies.isEmpty()){
+            if (dependencies == null || dependencies.isEmpty()){
                 n ++;
                 continue;
             }

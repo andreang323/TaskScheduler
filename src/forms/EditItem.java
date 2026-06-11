@@ -231,27 +231,6 @@ public class EditItem extends JFrame {
             System.out.println("Invalid Start/End Time Format");
             return;
         }
-
-
-//        if (lockRadioButton.isSelected()) {
-//            // StartTime locked, treat endTime as driven
-//            if (startDate != null) {
-//                LocalDateTime endTime = startDate.plusMinutes(durationMinutes);
-//                EndTime.setText(endTime.format(DATE_FORMAT));
-//            }
-//        } else if (lockRadioButton1.isSelected()) {
-//            // endtime locked, treat startTime as driven
-//            if (endDate != null) {
-//                LocalDateTime startTime = endDate.minusMinutes(durationMinutes);
-//                StartTime.setText(startTime.format(DATE_FORMAT));
-//            }
-//        } else if (lockRadioButton2.isSelected()) {
-//            // duration is locked, treat endTime as driven
-//            if (startDate != null) {
-//                LocalDateTime startTime = startDate.plusMinutes(durationMinutes);
-//                EndTime.setText(startTime.format(DATE_FORMAT));
-//            }
-//        }
     }
 
     private static String getDurationString(LocalDateTime startDate, LocalDateTime endDate) {
@@ -295,18 +274,6 @@ public class EditItem extends JFrame {
         }
     }
 
-//    private void restoreDependencySelections() {
-//        mustImmediatelyFollow.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-//        mustImmediatelyPrecede.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-//        mustPrecede.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-//        mustFollow.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-//
-//        selectDependencyValues(mustImmediatelyFollow, TaskDependency.DependencyType.IMMEDIATELY_AFTER);
-//        selectDependencyValues(mustImmediatelyPrecede, TaskDependency.DependencyType.IMMEDIATELY_BEFORE);
-//        selectDependencyValues(mustPrecede, TaskDependency.DependencyType.LOOSELY_BEFORE);
-//        selectDependencyValues(mustFollow, TaskDependency.DependencyType.LOOSELY_AFTER);
-//    }
-
     public EditItem(String newTitle, Task newTask, boolean editing, List<Task> tasks) {
         this.task = newTask;
         this.editing = editing;
@@ -329,22 +296,8 @@ public class EditItem extends JFrame {
         }
 
         this.tasks = tasks;
-        String[] taskNames = new String[tasks.size() + 1];
-        taskNames[0] = "[None]";
 
-        for (int i = 0; i < tasks.size(); i++) {
-            taskNames[i + 1] = tasks.get(i).getName();
-        }
 
-        // Populate depeandcy lists with data
-//        isDependedOn.setListData(taskNames);
-//        mustImmediatelyFollow.setListData(taskNames);
-//        mustImmediatelyPrecede.setListData(taskNames);
-//        mustPrecede.setListData(taskNames);
-//        mustFollow.setListData(taskNames);
-//        dependsOn.setListData(taskNames);
-
-//        restoreDependencySelections();
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setContentPane(contentPane);
@@ -387,52 +340,12 @@ public class EditItem extends JFrame {
         );
 
         task.setDuration(Long.parseLong(Duration.getText()));
-//        task.setLockStartTime(lockRadioButton.isSelected());
-//        task.setLockEndTime(lockRadioButton2.isSelected());
         task.setPriority(Integer.parseInt(Priority.getText()));
         task.setOptional(Optional.isSelected());
         task.setDescription(description.getText());
 
-        // Process dependencies
-        List<List<String>> dependencyLists = List.of(
-//                isDependedOn.getSelectedValuesList(),
-                mustImmediatelyFollow.getSelectedValuesList(),
-                mustImmediatelyPrecede.getSelectedValuesList(),
-                mustPrecede.getSelectedValuesList(),
-                mustFollow.getSelectedValuesList() //,
-//                dependsOn.getSelectedValuesList()
-        );
-        List<TaskDependency.DependencyType> dependencyTypes = List.of(
-                TaskDependency.DependencyType.IMMEDIATELY_AFTER,
-                TaskDependency.DependencyType.IMMEDIATELY_BEFORE,
-                TaskDependency.DependencyType.LOOSELY_BEFORE,
-                TaskDependency.DependencyType.LOOSELY_AFTER
-        );
-
-        // Iterate over tasks to check
-        List<TaskDependency> dependencies = new ArrayList<TaskDependency>();
-        for (Task task : tasks) {
-            // Iterate over dependency types
-            System.out.println("Inspecting task relationships:" + task.getName());
-            for (int i = 0; i < dependencyLists.size(); i++) {
-                // Iterate over dependencies of each type
-                System.out.println("  Inspecting dependency type: " + dependencyLists.get(i));
-                for (String name : dependencyLists.get(i)) {
-                    // Iterate over dependency names of a specific type
-                    System.out.println("    Inspecting selected dependency: " + name);
-                    if (name.equals("[NONE]")) {
-                        break;
-                    } else if (name.equals(task.getName())) {
-                        TaskDependency dependency = new TaskDependency();
-                        dependency.setDependencyTaskID(task.getTaskID());
-                        dependency.setType(dependencyTypes.get(i));
-                        dependencies.add(dependency);
-                    }
-                }
-            }
-        }
-        this.task.setDependencies(dependencies);
-        System.out.println("Final dependency list: " + this.task.getDependencies());
+        //this.task.setDependencies(dependencies);
+        //System.out.println("Final dependency list: " + this.task.getDependencies());
 
         // Notify the listener with the task object
         if (saveButtonListener != null) {
