@@ -9,6 +9,7 @@ public class TaskDependency {
     }
 
     private int DependencyTaskID = -1;
+    private String taskName;
     private DependencyType type;
     private int RepeatCount = 1;
 
@@ -34,5 +35,13 @@ public class TaskDependency {
 
     public void setRepeatCount(int repeatCount) {
         RepeatCount = repeatCount;
+    }
+
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
     }
 }

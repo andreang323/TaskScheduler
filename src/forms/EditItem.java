@@ -1,8 +1,11 @@
 package forms;
 
+import Tasks.Schedule;
+import Tasks.SolvedTask;
 import Tasks.Task;
 import Tasks.TaskDependency;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -14,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.*;
 
@@ -27,11 +31,6 @@ public class EditItem extends JFrame {
     private JTextField EndTime;
     private JTextField Duration;
 
-//    private ButtonGroup lockButtonGroup;
-//    private JRadioButton lockRadioButton;
-//    private JRadioButton lockRadioButton1;
-//    private JRadioButton lockRadioButton2;
-
     private JTextField Priority;
     private JList<String> isDependedOn;
     private JList<String> mustImmediatelyFollow;
@@ -42,9 +41,9 @@ public class EditItem extends JFrame {
     private JCheckBox Optional;
     private JLabel timeNote1;
     private JEditorPane description;
-    private JButton addDependencyButton;
     private JScrollPane dependencyScrollPane;
     private JLabel dependenciesSectionLabel;
+    private JButton addDependencyButton;
     private TimeLockListener timeLockListener;
     private SaveButtonListener saveButtonListener;
     private Task task;
@@ -53,6 +52,7 @@ public class EditItem extends JFrame {
     private static final DateTimeFormatter DATE_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private List<Task> tasks;
+    private List<TaskDependency> dependencies;
 
     public void setupPanel() {
 
@@ -79,6 +79,8 @@ public class EditItem extends JFrame {
 //            lockRadioButton2.setSelected(task.isLockEndTime());
             Priority.setText(String.valueOf(task.getPriority()));
             Optional.setSelected(task.isOptional());
+            dependencies = task.getDependencies();
+            refreshDependencyList();
         }
 
         // Save button event listener
@@ -146,22 +148,6 @@ public class EditItem extends JFrame {
         if (!EndTime.getText().isEmpty()) {
             endDate = LocalDateTime.parse(EndTime.getText(), DATE_FORMAT);
         }
-
-//        if (lockRadioButton.isSelected()) {
-//            // StartTime locked, treat duration as driven
-//            Duration.setText(getDurationString(startDate, endDate));
-//        } else if (lockRadioButton1.isSelected()) {
-//            // endtime locked, treat duration as driven
-//            Duration.setText(getDurationString(startDate, endDate));
-//        } else if (lockRadioButton2.isSelected()) {
-//            // duration locked, treat end time as driven
-//            if (!Duration.getText().isEmpty()) {
-//                long durationMinutes = Long.parseLong(Duration.getText());
-//                LocalDateTime endTime = startDate.plusMinutes(durationMinutes);
-//                EndTime.setText(endTime.format(DATE_FORMAT));
-//            }
-//
-//        }
     }
 
     public void handleEndTimeChange() {
@@ -184,20 +170,6 @@ public class EditItem extends JFrame {
         if (!StartTime.getText().isEmpty()) {
             startDate = LocalDateTime.parse(StartTime.getText(), DATE_FORMAT);
         }
-
-//        if (lockRadioButton.isSelected()) {
-//            // StartTime locked, treat duration as driven
-//            Duration.setText(getDurationString(startDate, endDate));
-//        } else if (lockRadioButton1.isSelected()) {
-//            // endtime locked, treat duration as driven
-//            Duration.setText(getDurationString(startDate, endDate));
-//        } else if (lockRadioButton2.isSelected()) {
-//            if (!Duration.getText().isEmpty()) {
-//                long durationMinutes = Long.parseLong(Duration.getText());
-//                LocalDateTime startTime = endDate.minusMinutes(durationMinutes);
-//                StartTime.setText(startTime.format(DATE_FORMAT));
-//            }
-//        }
     }
 
     public void handleDurationChange() {
@@ -236,42 +208,6 @@ public class EditItem extends JFrame {
     private static String getDurationString(LocalDateTime startDate, LocalDateTime endDate) {
         long minutes = startDate.until(endDate, ChronoUnit.MINUTES);
         return String.valueOf(minutes);
-    }
-
-    private int getTaskListIndexForDependency(TaskDependency dependency) {
-        if (dependency == null || tasks == null) {
-            return -1;
-        }
-
-        for (int i = 0; i < tasks.size(); i++) {
-            if (tasks.get(i).getTaskID() == dependency.getDependencyTaskID()) {
-                return i + 1; // +1 because taskNames[0] is [None]
-            }
-        }
-
-        return -1;
-    }
-
-    private void selectDependencyValues(JList<String> list, TaskDependency.DependencyType type) {
-        if (task == null || task.getDependencies() == null) {
-            return;
-        }
-
-        List<Integer> selectedIndices = new ArrayList<>();
-
-        for (TaskDependency dependency : task.getDependencies()) {
-            if (dependency.getType() == type) {
-                int index = getTaskListIndexForDependency(dependency);
-                if (index >= 0) {
-                    selectedIndices.add(index);
-                }
-            }
-        }
-
-        if (!selectedIndices.isEmpty()) {
-            int[] indices = selectedIndices.stream().mapToInt(Integer::intValue).toArray();
-            list.setSelectedIndices(indices);
-        }
     }
 
     public EditItem(String newTitle, Task newTask, boolean editing, List<Task> tasks) {
@@ -344,7 +280,7 @@ public class EditItem extends JFrame {
         task.setOptional(Optional.isSelected());
         task.setDescription(description.getText());
 
-        //this.task.setDependencies(dependencies);
+        task.setDependencies(dependencies);
         //System.out.println("Final dependency list: " + this.task.getDependencies());
 
         // Notify the listener with the task object
@@ -356,4 +292,70 @@ public class EditItem extends JFrame {
         dispose();
     }
 
+
+    // Create a new dependency panel with dependency description,
+    // edit button, and delete button
+    public JPanel createDependencyPanel(TaskDependency dependency) {
+        String description = dependency.getRepeatCount() + " of " + dependency.getTaskName();
+
+        switch (dependency.getType()){
+            case LOOSELY_AFTER:
+                description = description + " must occur after";
+                break;
+            case IMMEDIATELY_AFTER:
+                description = description + " must occur immediately after";
+                break;
+            case LOOSELY_BEFORE:
+                description = description + " must occur before";
+                break;
+            case IMMEDIATELY_BEFORE:
+                description = description + " must occur immediately before";
+                break;
+        }
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        JLabel dependencyDescription = new JLabel(description);
+
+        JButton editButton = new JButton("Edit");
+        JButton deleteButton = new JButton("Delete");
+
+        // EDIT BUTTON FUNCTIONALITY
+        editButton.addActionListener(e -> {
+            EditDependency editDependency = new EditDependency(tasks, dependency, "Editing dependency:", task.getName());
+
+            editDependency.setVisible(true);
+
+            editDependency.setSaveButtonListener(updated -> {
+                refreshDependencyList();
+            });
+        });
+
+        // DELETE BUTTON FUNCTIONALITY
+        deleteButton.addActionListener(e -> {
+            dependencies.remove(dependency);
+            refreshDependencyList();
+        });
+
+        panel.add(dependencyDescription);
+        panel.add(Box.createHorizontalGlue());
+        panel.add(editButton);
+        panel.add(Box.createRigidArea(new Dimension(5, 0)));
+        panel.add(deleteButton);
+        panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        return panel;
+    }
+
+    private void refreshDependencyList() {
+        dependencyScrollPane.removeAll();
+
+        if (dependencies != null) {
+            for (TaskDependency dependency : dependencies) {
+                dependencyScrollPane.add(createDependencyPanel(dependency));
+            }
+
+            dependencyScrollPane.revalidate();
+            dependencyScrollPane.repaint();
+        }
+    }
 }
