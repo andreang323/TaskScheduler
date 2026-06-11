@@ -1,7 +1,5 @@
 package forms;
 
-import Tasks.Schedule;
-import Tasks.SolvedTask;
 import Tasks.Task;
 import Tasks.TaskDependency;
 
@@ -17,7 +15,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import javax.swing.*;
 
@@ -42,6 +39,7 @@ public class EditItem extends JFrame {
     private JLabel timeNote1;
     private JEditorPane description;
     private JScrollPane dependencyScrollPane;
+    private JPanel dependencyListPanel;
     private JLabel dependenciesSectionLabel;
     private JButton addDependencyButton;
     private TimeLockListener timeLockListener;
@@ -80,8 +78,16 @@ public class EditItem extends JFrame {
             Priority.setText(String.valueOf(task.getPriority()));
             Optional.setSelected(task.isOptional());
             dependencies = task.getDependencies();
-            refreshDependencyList();
+            if (dependencies == null) {
+                dependencies = new ArrayList<>();
+                task.setDependencies(dependencies);
+            }
         }
+        dependencyListPanel = new JPanel();
+        dependencyListPanel.setLayout(new BoxLayout(dependencyListPanel, BoxLayout.Y_AXIS));
+        dependencyScrollPane.setViewportView(dependencyListPanel);
+
+        refreshDependencyList();
 
         // Save button event listener
         createButton.addActionListener(new ActionListener() {
@@ -125,6 +131,16 @@ public class EditItem extends JFrame {
         });
 
         addDependencyButton.addActionListener(e -> {
+            if (tasks.size() <= 1) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "You need at least one other task to create a dependency.",
+                        "Cannot Add Dependency",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
             TaskDependency newDependency = new TaskDependency();
             newDependency.setType(TaskDependency.DependencyType.IMMEDIATELY_AFTER);
             newDependency.setRepeatCount(1);
@@ -159,7 +175,7 @@ public class EditItem extends JFrame {
                 task.getDependencies().add(dependency);
 
                 System.out.println("Added dependency: " + dependency);
-                refreshDependencyDisplay();
+                refreshDependencyList();
             });
         });
 
@@ -187,19 +203,6 @@ public class EditItem extends JFrame {
         if (!EndTime.getText().isEmpty()) {
             endDate = LocalDateTime.parse(EndTime.getText(), DATE_FORMAT);
         }
-    }
-
-    private void refreshDependencyDisplay() {
-        dependencyScrollPane.removeAll();
-
-//        for (TaskDependency dependency : task.getDependencies()) {
-//            dependencyScrollPane.add(
-//                    createDependencyPanel(dependency)
-//            );
-//        }
-
-        dependencyScrollPane.revalidate();
-        dependencyScrollPane.repaint();
     }
 
     public void handleEndTimeChange() {
@@ -399,15 +402,16 @@ public class EditItem extends JFrame {
     }
 
     private void refreshDependencyList() {
-        dependencyScrollPane.removeAll();
+        dependencyListPanel.removeAll();
 
         if (dependencies != null) {
             for (TaskDependency dependency : dependencies) {
-                dependencyScrollPane.add(createDependencyPanel(dependency));
+                dependencyListPanel.add(createDependencyPanel(dependency));
+                dependencyListPanel.add(Box.createRigidArea(new Dimension(0, 5)));
             }
-
-            dependencyScrollPane.revalidate();
-            dependencyScrollPane.repaint();
         }
+
+        dependencyListPanel.revalidate();
+        dependencyListPanel.repaint();
     }
 }
