@@ -147,6 +147,62 @@ public class ScheduleSolver {
             return List.of();
         }
 
+        // Add any repeat tasks that we need to add
+        int v = 0;
+        while (v < solvingTaskList.size()) {
+            SolvingTask solvingTask = solvingTaskList.get(v);
+            Task baseTask = tasks.get(solvingTask.taskIndex);
+            List<TaskDependency> dependencies = baseTask.getDependencies();
+            // No dependencies? go on
+            if (dependencies == null || dependencies.isEmpty()) {
+                v++;
+                continue;
+            }
+            // For each dependency:
+            for (int p = 0; p < dependencies.size(); p++) {
+                // current dependency
+                TaskDependency dependency = dependencies.get(p);
+                int repeats = dependency.getRepeatCount();
+                // Invalid dependencies can cause a cascading effect and
+                // I honestly have no interest in propagating invalidation
+                // up the tree so we will kill it here
+                if (invalidTaskIDs.contains(dependency.getDependencyTaskID())) {
+                    System.out.println("Dependency on invalid task found: aborting.");
+                    return List.of();
+                }
+
+                int matchID = dependency.getDependencyTaskID();
+
+                // Abort if self-referential dependency found
+                if (solvingTask.taskID == matchID) {
+                    System.out.println("Self-referential dependency found: aborting.");
+                    return List.of();
+                }
+
+                // Create a list of tasks with the correct taskID at least repeats long
+                List<SolvingTask> matchingTasks = new ArrayList<>();
+                // Check all solving tasks for matching taskID
+                for (SolvingTask matchingTask : solvingTaskList) {
+                    if (matchingTask.taskID == matchID) {
+                        matchingTasks.add(matchingTask);
+                        if (matchingTasks.size() == repeats) {
+                            break;
+                        }
+                    }
+                }
+                // out of solving tasks with matching taskID and we still need repeats:
+                if (matchingTasks.size() < repeats) {
+                    while (matchingTasks.size() < repeats) {
+                        // add another solving task with the correct taskID
+                        SolvingTask newTask = new SolvingTask(matchingTasks.getFirst().taskIndex, taskMap.get(matchID), ctx, scheduleStart, scheduleEnd);
+                        solvingTaskList.add(newTask);
+                        matchingTasks.add(newTask);
+                    }
+                }
+            }
+            v ++;
+        }
+
         // Add dependencies for each task
         int n = 0;
         while (n < solvingTaskList.size()){
@@ -163,39 +219,14 @@ public class ScheduleSolver {
                 // current dependency
                 TaskDependency dependency = dependencies.get(p);
                 int repeats = dependency.getRepeatCount();
-                // Invalid dependencies can cause a cascading effect and
-                // I honestly have no interest in propagating invalidation
-                // up the tree so we will kill it here
-                if (invalidTaskIDs.contains(dependency.getDependencyTaskID())){
-                    System.out.println("Dependency on invalid task found: aborting.");
-                    return List.of();
-                }
-
                 int matchID = dependency.getDependencyTaskID();
 
-                // Abort if self-referential dependency found
-                if (solvingTask.taskID == matchID){
-                    System.out.println("Self-referential dependency found: aborting.");
-                    return List.of();
-                }
-
                 // Create a list of tasks with the correct taskID at least repeats long
-                int seenMatches = 0;
                 List<SolvingTask> matchingTasks = new ArrayList<>();
                 // Check all solving tasks for matching taskID
                 for (SolvingTask matchingTask : solvingTaskList){
                     if (matchingTask.taskID == matchID){
                         matchingTasks.add(matchingTask);
-                    }
-                }
-                // out of solving tasks with matching taskID and we still need repeats:
-                if (matchingTasks.size() < repeats){
-                    while (matchingTasks.size() < repeats){
-                        // add another solving task with the correct taskID
-                        SolvingTask newTask = new SolvingTask(matchingTasks.getFirst().taskIndex, taskMap.get(matchID), ctx, scheduleStart, scheduleEnd);
-                        solvingTaskList.add(newTask);
-                        matchingTasks.add(newTask);
-
                     }
                 }
 
