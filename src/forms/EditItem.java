@@ -44,9 +44,6 @@ public class EditItem extends JFrame {
     private JList<String> dependsOn;
     private JButton validateButton;
     private JCheckBox Optional;
-    private JCheckBox skipDependentTaskIfCheckBox;
-    private JCheckBox reduceDurationOfThisCheckBox;
-    private JTextField textField1;
     private JLabel timeNote1;
     private JLabel timeNote2;
     private JEditorPane description;
@@ -339,13 +336,47 @@ public class EditItem extends JFrame {
             taskNames[i + 1] = tasks.get(i).getName();
         }
 
-        // FIXME: Does not select tasks on edit
-        isDependedOn.setListData(taskNames);
+        // Populate depeandcy lists with data
+//        isDependedOn.setListData(taskNames);
         mustImmediatelyFollow.setListData(taskNames);
         mustImmediatelyPrecede.setListData(taskNames);
         mustPrecede.setListData(taskNames);
         mustFollow.setListData(taskNames);
-        dependsOn.setListData(taskNames);
+//        dependsOn.setListData(taskNames);
+
+        // FIXME: Does not select tasks on edit
+//        for(TaskDependency dependency : task.getDependencies()) {
+//            if(dependency.getType() == TaskDependency.DependencyType.IMMEDIATELY_AFTER) {
+//                mustImmediatelyFollow.setSelectedIndex(mustImmediatelyFollow.);
+//            }
+//        }
+
+        // Select dependency items in the lists when editing
+        List<Integer> selectedIndices = new ArrayList<>();
+        if (task.getDependencies() != null) {
+            for (TaskDependency dependency : task.getDependencies()) {
+                if (dependency.getType() == TaskDependency.DependencyType.IMMEDIATELY_AFTER) {
+                    // find the task in `tasks` with the same TaskID
+                    int foundIndex = -1;
+                    for (int i = 0; i < tasks.size(); i++) {
+                        if (tasks.get(i).getTaskID() == dependency.getDependencyTaskID()) {
+                            foundIndex = i;
+                            break;
+                        }
+                    }
+                    if (foundIndex != -1) {
+                        // +1 because taskNames[0] == "[None]" and we shifted tasks by 1
+                        selectedIndices.add(foundIndex + 1);
+                    }
+                }
+            }
+
+            // apply selections (if any)
+            if (!selectedIndices.isEmpty()) {
+                int[] sel = selectedIndices.stream().mapToInt(Integer::intValue).toArray();
+                mustImmediatelyFollow.setSelectedIndices(sel);
+            }
+        }
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setContentPane(contentPane);
@@ -414,9 +445,13 @@ public class EditItem extends JFrame {
         List<TaskDependency> dependencies = new ArrayList<TaskDependency>();
         for (Task task : tasks) {
             // Iterate over dependency types
+            System.out.println("Inspecting task relationships:" + task.getName());
             for (int i = 0; i < dependencyLists.size(); i++) {
                 // Iterate over dependencies of each type
+                System.out.println("  Inspecting dependency type: " + dependencyLists.get(i));
                 for (String name : dependencyLists.get(i)) {
+                    // Iterate over dependency names of a specific type
+                    System.out.println("    Inspecting selected dependency: " + name);
                     if (name.equals("[NONE")) {
                         break;
                     } else if (name.equals(task.getName())) {
@@ -429,6 +464,7 @@ public class EditItem extends JFrame {
             }
         }
         this.task.setDependencies(dependencies);
+        System.out.println("Final dependency list: " + this.task.getDependencies());
 
         // Notify the listener with the task object
         if (saveButtonListener != null) {
