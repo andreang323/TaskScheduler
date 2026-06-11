@@ -355,16 +355,16 @@ public class EditItem extends JFrame {
 
         switch (dependency.getType()){
             case LOOSELY_AFTER:
-                description = description + " must occur after";
+                description = "This task must occur after " + description;
                 break;
             case IMMEDIATELY_AFTER:
-                description = description + " must occur immediately after";
+                description = "This task must occur immediately after " + description;
                 break;
             case LOOSELY_BEFORE:
-                description = description + " must occur before";
+                description = "This task must occur before " + description;
                 break;
             case IMMEDIATELY_BEFORE:
-                description = description + " must occur immediately before";
+                description = "This task must occur immediately before " + description;
                 break;
         }
 
