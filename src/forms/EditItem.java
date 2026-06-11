@@ -84,6 +84,7 @@ public class EditItem extends JFrame {
             }
         }
         dependencyListPanel = new JPanel();
+        dependencyListPanel.setBackground(Color.white);
         dependencyListPanel.setLayout(new BoxLayout(dependencyListPanel, BoxLayout.Y_AXIS));
         dependencyScrollPane.setViewportView(dependencyListPanel);
 
