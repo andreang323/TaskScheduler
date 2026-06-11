@@ -62,8 +62,8 @@ public class ScheduleSolver {
     }
 
     public List<Schedule> GenerateSchedules(List<Task> tasks, long scheduleStart, long scheduleEnd, int maxSolutions) {
-        Instant startInstant = Instant.ofEpochMilli(scheduleStart);
-        Instant endInstant = Instant.ofEpochMilli(scheduleEnd);
+        Instant startInstant = Instant.ofEpochSecond(scheduleStart);
+        Instant endInstant = Instant.ofEpochSecond(scheduleEnd);
         LocalDateTime startTime =
                 LocalDateTime.ofInstant(startInstant, ZoneId.of("UTC"));
         LocalDateTime endTime =
