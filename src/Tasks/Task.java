@@ -1,5 +1,6 @@
 package Tasks;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Task {
@@ -21,7 +22,7 @@ public class Task {
     // Priority of task
     private int priority;
     // List of task dependencies
-    private List<TaskDependency> dependencies;
+    private List<TaskDependency> dependencies = new ArrayList<>();
     // Unique ID of task
     private int taskID;
     private String Description;

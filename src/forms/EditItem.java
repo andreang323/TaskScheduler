@@ -156,7 +156,7 @@ public class EditItem extends JFrame {
                     }
                 }
 
-                task.getDependencies().add(dependency);
+                dependencies.add(dependency);
 
                 System.out.println("Added dependency: " + dependency);
                 refreshDependencyDisplay();
@@ -333,7 +333,7 @@ public class EditItem extends JFrame {
         task.setDescription(description.getText());
 
         task.setDependencies(dependencies);
-        //System.out.println("Final dependency list: " + this.task.getDependencies());
+        System.out.println("Final dependency list: " + this.task.getDependencies());
 
         // Notify the listener with the task object
         if (saveButtonListener != null) {
