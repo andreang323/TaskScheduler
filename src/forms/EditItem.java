@@ -26,9 +26,6 @@ public class EditItem extends JFrame {
     private JTextField StartTime;
     private JTextField EndTime;
     private JTextField Duration;
-//    private JRadioButton lockStartTimeCheckBox;
-//    private JRadioButton lockRadioButton1;
-//    private JRadioButton lockRadioButton2;
 
     private JCheckBox lockCheckBox;
     private JCheckBox lockCheckBox1;

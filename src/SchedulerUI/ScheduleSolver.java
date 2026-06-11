@@ -96,15 +96,15 @@ public class ScheduleSolver {
         // Set up lookup table for tasks
         Map<Integer, Task> taskMap = new HashMap<>();
         for (Task task : tasks){
-            System.out.println(
-                    "INPUT TASK: "
-                            + task.getName()
-                            + " start=" + task.getStartTime()
-                            + " end=" + task.getEndTime()
-                            + " duration=" + task.getDuration()
-                            + " window=" + (task.getEndTime() - task.getStartTime())
-                            + " optional=" + task.isOptional()
-            );
+//            System.out.println(
+//                    "INPUT TASK: "
+//                            + task.getName()
+//                            + " start=" + task.getStartTime()
+//                            + " end=" + task.getEndTime()
+//                            + " duration=" + task.getDuration()
+//                            + " window=" + (task.getEndTime() - task.getStartTime())
+//                            + " optional=" + task.isOptional()
+//            );
             taskMap.put(task.getTaskID(), task);
 
             // Validate task:
@@ -278,8 +278,8 @@ public class ScheduleSolver {
         // else generate only maxSolutions amount of solutions
         int k = 0;
         while ((k < maxSolutions)|| (maxSolutions == 0)){
-            Status status = s.check();
-            System.out.println("SOLVER STATUS: " + status);
+//            Status status = s.check();
+//            System.out.println("SOLVER STATUS: " + status);
             if (s.check() == Status.SATISFIABLE){
                 Model m = s.getModel();
                 BoolExpr solution_c = ctx.mkTrue();
@@ -299,7 +299,7 @@ public class ScheduleSolver {
                     if (isActive){
                         // init new solved task
                         SolvedTask newSolvedTask = new SolvedTask(tasks.get(currentSolving.taskIndex), tStartLong, tEndLong);
-                        System.out.println("active: " + isActive + " start time: " + tStartLong + " end time: " + tEndLong);
+                        //System.out.println("active: " + isActive + " start time: " + tStartLong + " end time: " + tEndLong);
                         // add new solved task
                         solvedTaskList.add(newSolvedTask);
                     }
