@@ -235,7 +235,7 @@ public class ScheduleSolver {
                 for (int m = 0; m < matchingTasks.size(); m++){
                     // add a term
                     SolvingTask matchingTask = matchingTasks.get(m);
-                    terms[m] = (ctx.mkIntConst("dp_" + p + "_" + m));
+                    terms[m] = (ctx.mkIntConst("dp_" +  n + "_ "+ p + "_" + m));
 
                     // both tasks must be active
                     BoolExpr activeAndSatisfies = ctx.mkAnd(ctx.mkEq(matchingTask.active, ctx.mkTrue()), ctx.mkEq(solvingTask.active, ctx.mkTrue()));
@@ -246,22 +246,22 @@ public class ScheduleSolver {
                     switch (dependency.getType()){
                         case LOOSELY_AFTER:
                             // START TIME OF DEPENDENT >= END TIME OF DEPENDENCY
-                            activeAndSatisfies = ctx.mkAnd(ctx.mkGe(solvingTask.taskStart, matchingTask.taskEnd));
+                            activeAndSatisfies = ctx.mkAnd(activeAndSatisfies, ctx.mkAnd(ctx.mkGe(solvingTask.taskStart, matchingTask.taskEnd)));
                             break;
 
                         case IMMEDIATELY_AFTER:
                             // START TIME OF DEPENDENT == END TIME OF DEPENDENCY
-                            activeAndSatisfies = ctx.mkAnd(ctx.mkEq(solvingTask.taskStart, matchingTask.taskEnd));
+                            activeAndSatisfies = ctx.mkAnd(activeAndSatisfies, ctx.mkAnd(ctx.mkEq(solvingTask.taskStart, matchingTask.taskEnd)));
                             break;
 
                         case LOOSELY_BEFORE:
                             // END TIME OF DEPENDENT =< START TIME OF DEPENDENCY
-                            activeAndSatisfies = ctx.mkAnd(ctx.mkLe(solvingTask.taskEnd, matchingTask.taskStart));
+                            activeAndSatisfies = ctx.mkAnd(activeAndSatisfies, ctx.mkAnd(ctx.mkLe(solvingTask.taskEnd, matchingTask.taskStart)));
                             break;
 
                         case IMMEDIATELY_BEFORE:
                             // END TIME OF DEPENDENT == START TIME OF DEPENDENCY
-                            activeAndSatisfies = ctx.mkAnd(ctx.mkEq(solvingTask.taskEnd, matchingTask.taskStart));
+                            activeAndSatisfies = ctx.mkAnd(activeAndSatisfies, ctx.mkAnd(ctx.mkEq(solvingTask.taskEnd, matchingTask.taskStart)));
                             break;
                     }
                     Expr ifActive = ctx.mkITE(activeAndSatisfies, then, elseStatement);
