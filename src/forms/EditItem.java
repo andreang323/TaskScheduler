@@ -132,7 +132,7 @@ public class EditItem extends JFrame {
         });
 
         addDependencyButton.addActionListener(e -> {
-            if (tasks.isEmpty() || (tasks.size() == 1 && tasks.getFirst().getName().equals(task.getName()))) {
+            if (tasks.isEmpty() || (tasks.size() == 1 && tasks.getFirst().getName().equals(Name.getText()))) {
                 JOptionPane.showMessageDialog(
                         this,
                         "You need at least one other task to create a dependency.",

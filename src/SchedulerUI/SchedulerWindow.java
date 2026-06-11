@@ -3,6 +3,7 @@ package SchedulerUI;
 import Tasks.Schedule;
 import Tasks.Task;
 import Tasks.SolvedTask;
+import Tasks.TaskDependency;
 import forms.EditItem;
 import forms.SaveButtonListener;
 
@@ -321,6 +322,9 @@ public class SchedulerWindow extends JFrame {
 
         deleteButton.addActionListener(e -> {
             tasks.remove(task);
+            for (Task t : tasks) {
+                t.getDependencies().removeIf(dependency -> dependency.getDependencyTaskID() == task.getTaskID());
+            }
             refreshTaskList();
         });
 
